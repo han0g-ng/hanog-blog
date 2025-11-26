@@ -27,18 +27,19 @@ export function getSortedWriteupsData() {
     // Use gray-matter to parse the post metadata section
     const matterResult = matter(fileContents);
 
+    // Create title from filename if not in frontmatter
+    const title = matterResult.data.title || id.replace(/-/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
+
     // Combine the data with the id
     return {
       id,
-      ...(matterResult.data as { 
-        title: string; 
-        date: string; 
-        description: string;
-        ctf?: string;
-        category?: string;
-        difficulty?: string;
-        tags?: string[];
-      }),
+      title,
+      date: matterResult.data.date || new Date().toISOString().split('T')[0],
+      description: matterResult.data.description || '',
+      ctf: matterResult.data.ctf,
+      category: matterResult.data.category,
+      difficulty: matterResult.data.difficulty,
+      tags: matterResult.data.tags,
     };
   });
 

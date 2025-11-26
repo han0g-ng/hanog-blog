@@ -1,6 +1,7 @@
 import { getWriteupData, getAllWriteupIds } from '@/lib/writeups';
 import { MDXRemote } from 'next-mdx-remote/rsc';
 import Link from 'next/link';
+import { notFound } from 'next/navigation';
 
 export async function generateStaticParams() {
   const writeups = getAllWriteupIds();
@@ -11,7 +12,13 @@ export async function generateStaticParams() {
 
 export default async function WriteupPost({ params }: { params: { slug: string } }) {
   const { slug } = await params;
-  const writeupData = await getWriteupData(slug);
+  
+  let writeupData;
+  try {
+    writeupData = await getWriteupData(slug);
+  } catch (error) {
+    notFound();
+  }
 
   return (
     <article className="container mx-auto px-4 py-8 max-w-4xl">
