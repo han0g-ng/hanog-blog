@@ -31,19 +31,15 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="vi" suppressHydrationWarning>
-      {/* Áp dụng các lớp màu nền, màu chữ, và font trực tiếp vào thẻ <body>.
-        Đây là cách làm tốt nhất để đảm bảo toàn bộ trang tuân thủ theme.
-      */}
       <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased bg-white text-slate-900 dark:bg-[#121212] dark:text-slate-50`}
+        className={`${geistSans.variable} ${geistMono.variable} antialiased min-h-screen bg-white text-slate-900 dark:bg-gray-900 dark:text-slate-50 transition-colors duration-200`}
       >
         <ThemeProvider
           attribute="class"
-          defaultTheme="system"
+          defaultTheme="dark"
           enableSystem
-          disableTransitionOnChange
+          storageKey="hanog-blog-theme"
         >
-          {/* Div này bây giờ chỉ chịu trách nhiệm về layout flex */}
           <div className="flex min-h-screen flex-col">
             <Header />
             <main className="container mx-auto flex-grow px-4 py-8">
