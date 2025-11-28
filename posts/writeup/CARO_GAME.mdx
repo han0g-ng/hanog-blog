@@ -1,0 +1,240 @@
+
+# CARO GAME
+
+<div style={{ display: 'flex', justifyContent: 'center', margin: '2rem 0' }}>
+  <img
+    src="/images/writeup/caro/anh_bat_dau.png"
+    alt="Ảnh minh họa"
+    style={{ width: '100%', maxWidth: '600px', height: 'auto', borderRadius: '8px' }}
+  />
+</div>
+
+## Mở đầu
+
+Chúng ta được cung cấp 1 trang web, trong đó có các tính năng cơ bản như `register`, `login`, `create room`. Khi phòng có 2 người trở lên thì có thể tiến hành thi đấu với nhau.
+<div style={{ display: 'flex', justifyContent: 'center', margin: '1rem 0' }}>
+  <img
+    src="/images/writeup/caro/login.png"
+    alt="Ảnh login"
+    style={{ width: '100%', maxWidth: '600px', height: 'auto', borderRadius: '8px' }}
+  />
+</div>
+
+<div style={{ display: 'flex', justifyContent: 'center', margin: '1rem 0' }}>
+  <img
+    src="/images/writeup/caro/room.png"
+    alt="Ảnh tạo phòng"
+    style={{ width: '100%', maxWidth: '600px', height: 'auto', borderRadius: '8px' }}
+  />
+</div>
+
+<div style={{ display: 'flex', justifyContent: 'center', margin: '1rem 0' }}>
+  <img
+    src="/images/writeup/caro/game.png"
+    alt="Ảnh chơi game"
+    style={{ width: '100%', maxWidth: '600px', height: 'auto', borderRadius: '8px' }}
+  />
+</div>
+Ta có trang `profile` cho phép ta thay đổi tên hiển thị, `upload background` (đây là background cho phòng chơi mà ta tạo ở trên). Kế đó là `dashboard` để xem lịch sử thi đấu và kết quả.
+<div style={{ display: 'flex', justifyContent: 'center', margin: '1rem 0' }}>
+  <img
+    src="/images/writeup/caro/profile.png"
+    alt="Ảnh profile"
+    style={{ width: '100%', maxWidth: '600px', height: 'auto', borderRadius: '8px' }}
+  />
+</div>
+<br />
+
+Thử nghịch với chức năng đăng nhập, theo kinh nghiệm của mình thì nhập các kí hiệu đặc biệt `' " ( ), ...` xem sao.
+
+<div style={{ display: 'flex', justifyContent: 'center', margin: '1rem 0' }}>
+  <img
+    src="/images/writeup/caro/login_error.png"
+    alt="Login error"
+    style={{ width: '100%', maxWidth: '600px', height: 'auto', borderRadius: '8px' }}
+  />
+</div>
+<br />
+
+À há, thử với `display name`, `password` một hồi với đủ payload thì không thấy gì đặc biệt, nhưng thử với `username` thì thấy bão lỗi. Lỗi thế này khả năng do anh lập trình viên chưa có cơ chế sanitize hợp lý.
+<br />
+Như thế, một cách đơn giản ta thử SQLi xem sao, dùng payload `admin' OR 1 = 1#` thì đăng nhập vô trang admin được thật, ở đây mình tìm được flag đầu tiên `FLAG{c8166c44e2????b60c2540a0b01efe828}`
+
+<div style={{ display: 'flex', justifyContent: 'center', margin: '1rem 0' }}>
+  <img
+    src="/images/writeup/caro/flag1.png"
+    alt="Flag1"
+    style={{ width: '100%', maxWidth: '600px', height: 'auto', borderRadius: '8px' }}
+  />
+</div>
+<br />
+
+Tạm thời note lỗi này lại và thử các chức năng khác xem sao. Tiếp tục ở trường `username` và `display name` thử `<h1>displayname</h1>`, các chức năng trên bị bôi đậm lên thật. Sau đó thử alert các kiểu vẫn được, tuy nhiên cũng chưa nghĩ ra cách khai thác gì tiếp theo nên mình tiếp tục bỏ ngỏ ở đây.
+
+<div style={{ display: 'flex', justifyContent: 'center', margin: '1rem 0' }}>
+  <img
+    src="/images/writeup/caro/html_injection.png"
+    alt="html injection"
+    style={{ width: '100%', maxWidth: '600px', height: 'auto', borderRadius: '8px' }}
+  />
+</div>
+<br />
+
+Bình thường mình hay đi test theo từng chức năng, tiếp theo thử xem chức năng chính của game là phần tạo phòng và chơi game xem sao. Join vô phòng của admin nhưng lại có dòng thông báo "Hacker detected but you are not hacker" hiện lên. 
+<br />
+
+Quan sát trong Burp thì thấy có 1 request với API `socket.io/?EIO=4&transport=websocket`. Thế rõ ràng là ứng dụng phải dùng gì đó liên quan tới websocket, mình đoán là trao đổi các thông tin trong room. 
+
+<br />
+
+Chợt nhớ ra trong Burp cũng bắt lại được các trao đổi liên quan đến websocket, mò mẫm lịch sử một hồi thì thấy flag thứ 2 hiện lên (bất ngờ thật) `FLAG{2eb745bbc0327???????22cf863a7df01}`
+
+<div style={{ display: 'flex', justifyContent: 'center', margin: '1rem 0' }}>
+  <img
+    src="/images/writeup/caro/hacker_websocket.png"
+    alt="Flag2"
+    style={{ width: '100%', maxWidth: '600px', height: 'auto', borderRadius: '8px' }}
+  />
+</div>
+<br />
+
+Nghịch một hồi với các chức năng tạo phòng, chơi game cũng chẳng thấy gì nữa, mình tiếp tục với trang `profile`
+
+Quan sát nhanh thì thấy có thể update background của các room (mà mình tạo) thông qua 2 cơ chế:
+1. 1.Nhập thẳng nội dung file vào theo đúng cấu trúc
+<div style={{ display: 'flex', justifyContent: 'center', margin: '1rem 0' }}>
+  <img
+    src="/images/writeup/caro/dataUrl.png"
+    alt="dataUrl"
+    style={{ width: '100%', maxWidth: '600px', height: 'auto', borderRadius: '8px' }}
+  />
+</div>
+<br />
+Đến đây tôi hí hửng truyền luôn vào webshell xem sao, biết khá chắc là không được, chỉ là để thử xem khi nhập dữ liệu thì nó hiển thị ra gì. Đoạn này mình nhờ tạm GPT.
+
+<div style={{ display: 'flex', justifyContent: 'center', margin: '1rem 0' }}>
+  <img
+    src="/images/writeup/caro/webshell.png"
+    alt="webshell"
+    style={{ width: '100%', maxWidth: '600px', height: 'auto', borderRadius: '8px' }}
+  />
+</div>
+<br />
+Thế là web chỉ hiện ra ở dạng text thật, mình thử chỉnh phần `image/png` thành nội dung khác nhưng cũng không thành công, mình đành gác lại thử cách khác trước.
+<br />
+2. Ở đây cho phép truyền vào 1 đường dẫn nào đó.
+<div style={{ display: 'flex', justifyContent: 'center', margin: '1rem 0' }}>
+  <img
+    src="/images/writeup/caro/url.png"
+    alt="url"
+    style={{ width: '100%', maxWidth: '600px', height: 'auto', borderRadius: '8px' }}
+  />
+</div>
+<br />
+Thay thành `https://example.com`, reload lại trang profile, nhận thấy 1 gói tin hiển thị thông tin ảnh background đã được cập nhật, đi theo đường dẫn này thì thấy trang example.com được chuyển thành dạng text.
+<div style={{ display: 'flex', justifyContent: 'center', margin: '1rem 0' }}>
+  <img
+    src="/images/writeup/caro/boardBg.png"
+    alt="boardBg"
+    style={{ width: '100%', maxWidth: '600px', height: 'auto', borderRadius: '8px' }}
+  />
+</div>
+<br />
+
+Nghĩ ngay đến SSRF, thay url thành `file:///etc/passwd` ta tìm được flag thứ 3: `FLAG{af63fbc683132?????f0f02276a667c}`
+<div style={{ display: 'flex', justifyContent: 'center', margin: '1rem 0' }}>
+  <img
+    src="/images/writeup/caro/etc_passwd.png"
+    alt="Flag3"
+    style={{ width: '100%', maxWidth: '600px', height: 'auto', borderRadius: '8px' }}
+  />
+</div>
+<br />
+
+Đến đây mình nghĩ là coi như đã giải được challenge này dễ dàng do gần như đã thành whitebox. Tuy nhiên mặc dù có thể đọc các file tùy ý nhưng có một vấn đề lớn, đó là: "Làm sao để tìm được đường dẫn chính xác của các file mà đọc???"
+<br />
+
+Đành phải thử các file cấu hình của hệ thống thôi, để ý trong file `/etc/passwd` trên dòng thứ 2 từ dưới lên, ứng dụng sử dụng Nodejs. Nhưng trước tiên theo kinh nghiệm mình thử `/proc/self/environ` xem sao.
+
+<div style={{ display: 'flex', justifyContent: 'center', margin: '1rem 0' }}>
+  <img
+    src="/images/writeup/caro/proc_self.png"
+    alt="proc_self"
+    style={{ width: '100%', maxWidth: '600px', height: 'auto', borderRadius: '8px' }}
+  />
+</div>
+<br />
+
+Hmmm, thế là biết thư mục home của ứng dụng này nằm ở đâu rồi, đó là `/usr/src/app`, mình thử tiếp tục với các file `package.json`, `server.js`, `app.js`,... Và cũng thu được kết quả:
+
+<div style={{ display: 'flex', justifyContent: 'center', margin: '1rem 0' }}>
+  <img
+    src="/images/writeup/caro/package_json.png"
+    alt="package_json"
+    style={{ width: '100%', maxWidth: '600px', height: 'auto', borderRadius: '8px' }}
+  />
+</div>
+<br />
+
+Một bước tiến dài, thu được thông tin về database, các phiên bản dịch vụ sử dụng. Mình đi kiếm các CVE thì cũng không thấy gì. Ít nhất cũng thu được thư mục tiếp theo cần xem xét tới, đó là `./src/server.js`:
+```
+import 'dotenv/config';
+import express from 'express';
+import http from 'http';
+import cors from 'cors';
+import { Server as SocketIOServer } from 'socket.io';
+import cookieParser from 'cookie-parser';
+import { createPool } from './db.js';
+
+// Routes
+import { registerRoomsRoute } from './routes/rooms.js';
+import { registerLogoutRoute } from './routes/logout.js';
+import { registerRegisterRoute } from './routes/register.js';
+import { registerLoginRoute } from './routes/login.js';
+import { registerMeRoute } from './routes/me.js';
+import { registerProfileRoute } from './routes/profile.js';
+import { registerProfileNameRoute } from './routes/profile_name.js';
+import { registerProfileBackgroundRoute } from './routes/profile_background.js';
+
+// Services
+import { roomIdToState } from './services/game.js';
+
+// Sockets
+import { registerSocketAuth } from './sockets/auth.js';
+import { handleLobbySubscribe } from './sockets/lobby_subscribe.js';
+import { handleRoomCreate } from './sockets/room_create.js';
+import { handleRoomJoin } from './sockets/room_join.js';
+import { handleRoomLeave } from './sockets/room_leave.js';
+import { handleGameMove } from './sockets/game_move.js';
+import { handleGameRestart } from './sockets/game_restart.js';
+import { setupTurnTimeout } from './sockets/turn_timeout.js';
+
+
+```
+<br />
+
+Coi như đã nắm hầu hết source code trong tay, mình cũng tìm được file làm việc với database của ứng dụng: `/usr/src/app/src/db.js`:
+
+<div style={{ display: 'flex', justifyContent: 'center', margin: '1rem 0' }}>
+  <img
+    src="/images/writeup/caro/db_js.png"
+    alt="db_js"
+    style={{ width: '100%', maxWidth: '600px', height: 'auto', borderRadius: '8px' }}
+  />
+</div>
+<br />
+
+Quá rõ ràng, ứng dụng đã bị SQLi ở ngay tính năng đăng nhập, điều này mình đã nhận ra ở trên nhưng giờ mới biết cấu trúc câu truy vấn. Sau một hồi thử đọc các file `.env`, `Dockerfile` nhưng không thành công thì mình đành quay lại với lỗi này tiếp.
+
+Câu truy vấn chỉ lấy ra 1 cột duy nhất, thực hiện chuỗi payload:
+```
+' UNION SELECT GROUP_CONCAT(table_name) FROM information_schema.tables#
+
+' UNION SELECT GROUP_CONCAT(column_name) FROM information_schena.columns WHERE table_name = 'flags'#
+
+'UNION SELECT flag_name FROM flags#
+```
+<br />
+Có một lưu ý nho nhỏ, do input đã được đưa qua một lớp filter nào đó nên nếu không sử dụng dấu comment `#` mà dùng `-- `  thì luôn bị bỏ dấu cách ở sau dẫn đến truy vấn bị lỗi.
+<br />
+Flag tiếp theo cũng xuất hiện: `FLAG{f789956f48c9???????14d315206f9a9}`

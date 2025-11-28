@@ -7,4 +7,5 @@ const nextConfig = {
   // Nếu không có cấu hình gì đặc biệt, nó có thể là một object rỗng.
 };
 
+
 export default nextConfig;
