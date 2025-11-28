@@ -1,4 +1,16 @@
-# SHOP THÚ CƯNG
+---
+title: 'SHOP THÚ CƯNG'
+date: '2025-11-29'
+description: 'Writeup chi tiết về challenge Shop Thú Cưng - khai thác SQLi, SSRF, File Upload'
+ctf: 'CTF Challenge'
+category: 'Web Exploitation'
+difficulty: 'Medium'
+tags: ['SQLi', 'SSRF', 'File Upload', 'JWT', 'RCE']
+---
+
+<div style={{ fontSize: '1.1rem' }}>
+
+<h1 style={{ textAlign: 'center', color: '#DC321F', fontSize: '2rem', fontWeight: '700' }}>SHOP THÚ CƯNG</h1>
 
 <div style={{ display: 'flex', justifyContent: 'center', margin: '2rem 0' }}>
   <img
@@ -8,7 +20,7 @@
   />
 </div>
 
-# Mở đầu
+<h2 style={{ color: 'white', fontWeight: '700', fontSize: '1.75rem' }}><span style={{ color: '#DC321F', marginLeft: '-1.5rem', marginRight: '0.5rem' }}>#</span> Mở đầu</h2>
 
 Hôm nay chúng ta sẽ đến với một challenge khá thú vị.<br />
 Có 5 flag phải tìm:
@@ -19,7 +31,7 @@ flag3: order detail của user conmeo
 flag4: trong database
 flag5: trong thư mục / ở server, tức yêu cầu phải rce được server
 ```
-# Bắt đầu thôi
+<h2 style={{ color: 'white', fontWeight: '700', fontSize: '1.75rem' }}><span style={{ color: '#DC321F', marginLeft: '-1.5rem', marginRight: '0.5rem' }}>#</span> Bắt đầu thôi</h2>
 Ban đầu khi mở trang web, ta thấy có nội dung đăng nhập, tạo tài khoản mới, quên mật khẩu.
 <div style={{ display: 'flex', justifyContent: 'center', margin: '2rem 0' }}>
   <img
@@ -125,8 +137,8 @@ Phân tích một chút, nếu sử dụng input là `hanog@hanog.com' and 1 = 0
 ```
 import requests
 
-burp0_url = "https://musoe.cyberjutsu-lab.tech:443/api/v2/auth/forgot-password"
-burp0_headers = {"Sec-Ch-Ua-Platform": "\"Windows\"", "Accept-Language": "en-US,en;q=0.9", "Accept": "application/json, text/plain, */*", "Sec-Ch-Ua": "\"Not_A Brand\";v=\"99\", \"Chromium\";v=\"142\"", "Content-Type": "application/json", "Sec-Ch-Ua-Mobile": "?0", "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/142.0.0.0 Safari/537.36", "Origin": "https://musoe.cyberjutsu-lab.tech", "Sec-Fetch-Site": "same-origin", "Sec-Fetch-Mode": "cors", "Sec-Fetch-Dest": "empty", "Referer": "https://musoe.cyberjutsu-lab.tech/forgot-password", "Accept-Encoding": "gzip, deflate, br", "Priority": "u=1, i", "Connection": "keep-alive"}
+burp0_url = "https://webchallenge:443/api/v2/auth/forgot-password"
+burp0_headers = {"Sec-Ch-Ua-Platform": "\"Windows\"", "Accept-Language": "en-US,en;q=0.9", "Accept": "application/json, text/plain, */*", "Sec-Ch-Ua": "\"Not_A Brand\";v=\"99\", \"Chromium\";v=\"142\"", "Content-Type": "application/json", "Sec-Ch-Ua-Mobile": "?0", "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/142.0.0.0 Safari/537.36", "Origin": "https://webchallenge", "Sec-Fetch-Site": "same-origin", "Sec-Fetch-Mode": "cors", "Sec-Fetch-Dest": "empty", "Referer": "https://webchallenge/forgot-password", "Accept-Encoding": "gzip, deflate, br", "Priority": "u=1, i", "Connection": "keep-alive"}
 burp0_json={"email": "payload"}
 requests.post(burp0_url, headers=burp0_headers, json=burp0_json)
 
@@ -361,7 +373,7 @@ Như thế rút ra được một số điều quan trọng:
 ```
 import requests
 
-burp0_url = "https://musoe.cyberjutsu-lab.tech/api/v1/plugins"
+burp0_url = "https://webchallenge/api/v1/plugins"
 burp0_headers = {
     "X-Access-Token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MiwidXNlcm5hbWUiOiJhZG1pbiIsInJvbGUiOiJhZG1pbiIsImlhdCI6MTc2MzkxMjIyNywiZXhwIjoxNzY0NTE3MDI3fQ.BC4yQh6vww2mav5qxEZVpB2MhW1k3QR9DsXkXFw9iv4"
 }
@@ -392,3 +404,5 @@ module.exports = {
 Tải plugin lên thành công, chạy thử và thấy Webhook có nội dung gửi về, từ đó mình tìm được folder và thay thế nội dung plugin trên để đọc file.
 <br />
 Flag 5: `FLAG{632f7879b5bea6??????e44e3943}`
+
+</div>

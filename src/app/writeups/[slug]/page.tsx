@@ -1,6 +1,7 @@
 import { getWriteupData, getAllWriteupIds } from '@/lib/writeups';
 import { compileMDX } from 'next-mdx-remote/rsc';
 import rehypePrism from 'rehype-prism-plus';
+import 'prismjs/themes/prism-tomorrow.css';
 
 type Props = {
     params: Promise<{ slug: string }>;
@@ -34,7 +35,9 @@ export default async function Writeup({ params }: Props) {
         options: {
             parseFrontmatter: false,
             mdxOptions: {
-                rehypePlugins: [rehypePrism],
+                rehypePlugins: [
+                    [rehypePrism, { showLineNumbers: true }]
+                ],
             },
         },
     });

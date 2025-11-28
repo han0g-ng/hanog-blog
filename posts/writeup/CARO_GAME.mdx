@@ -8,7 +8,9 @@ difficulty: 'Medium'
 tags: ['SQLi', 'XSS', 'SSRF', 'WebSocket']
 ---
 
-# CARO GAME
+<div style={{ fontSize: '1.1rem' }}>
+
+<h1 style={{ textAlign: 'center', color: '#DC321F', fontSize: '2rem', fontWeight: '700' }}>CARO GAME</h1>
 
 <div style={{ display: 'flex', justifyContent: 'center', margin: '2rem 0' }}>
   <img
@@ -18,7 +20,7 @@ tags: ['SQLi', 'XSS', 'SSRF', 'WebSocket']
   />
 </div>
 
-## Mở đầu
+<h2 style={{ color: 'white', fontWeight: '700', fontSize: '1.75rem' }}><span style={{ color: '#DC321F', marginLeft: '-1.5rem', marginRight: '0.5rem' }}>#</span> Mở đầu</h2>
 
 Chúng ta được cung cấp 1 trang web, trong đó có các tính năng cơ bản như `register`, `login`, `create room`. Khi phòng có 2 người trở lên thì có thể tiến hành thi đấu với nhau.
 <div style={{ display: 'flex', justifyContent: 'center', margin: '1rem 0' }}>
@@ -53,7 +55,7 @@ Ta có trang `profile` cho phép ta thay đổi tên hiển thị, `upload backg
   />
 </div>
 <br />
-
+<h2 style={{ color: 'white', fontWeight: '700', fontSize: '1.75rem' }}><span style={{ color: '#DC321F', marginLeft: '-1.5rem', marginRight: '0.5rem' }}>#</span> Bắt đầu thôi</h2>
 Thử nghịch với chức năng đăng nhập, theo kinh nghiệm của mình thì nhập các kí hiệu đặc biệt `' " ( ), ...` xem sao.
 
 <div style={{ display: 'flex', justifyContent: 'center', margin: '1rem 0' }}>
@@ -247,3 +249,5 @@ Câu truy vấn chỉ lấy ra 1 cột duy nhất, thực hiện chuỗi payload
 Có một lưu ý nho nhỏ, do input đã được đưa qua một lớp filter nào đó nên nếu không sử dụng dấu comment `#` mà dùng `-- `  thì luôn bị bỏ dấu cách ở sau dẫn đến truy vấn bị lỗi.
 <br />
 Flag tiếp theo cũng xuất hiện: `FLAG{f789956f48c9???????14d315206f9a9}`
+
+</div>
