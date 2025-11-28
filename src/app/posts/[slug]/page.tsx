@@ -3,7 +3,7 @@ import { compileMDX } from 'next-mdx-remote/rsc';
 import rehypePrism from 'rehype-prism-plus';
 
 type Props = {
-    params: { slug: string };
+    params: Promise<{ slug: string }>;
 };
 
 // Hàm này nói cho Next.js biết cần tạo ra những trang tĩnh nào
@@ -18,7 +18,8 @@ export async function generateStaticParams() {
 
 // Hàm này tạo metadata (title, description) cho trang
 export async function generateMetadata({ params }: Props) {
-    const { frontmatter } = await getPostData(params.slug);
+    const { slug } = await params;
+    const { frontmatter } = await getPostData(slug);
     return {
         title: frontmatter.title,
         description: frontmatter.description,
@@ -28,7 +29,8 @@ export async function generateMetadata({ params }: Props) {
 // Component chính để render trang
 export default async function Post({ params }: Props) {
     // BƯỚC 1: Lấy dữ liệu bài viết, bao gồm frontmatter và content
-    const { frontmatter, content } = await getPostData(params.slug);
+    const { slug } = await params;
+    const { frontmatter, content } = await getPostData(slug);
 
     // BƯỚC 2: Biên dịch nội dung MDX thành HTML/React components
     const { content: compiledContent } = await compileMDX({

