@@ -5,7 +5,7 @@ export default function AboutPage() {
         <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold mb-4 text-transparent bg-clip-text bg-gradient-to-r from-green-400 to-blue-500 dark:from-green-300 dark:to-blue-400">
           About
         </h1>
-        <p className="text-base sm:text-lg text-gray-600 dark:text-gray-400 max-w-2xl mx-auto">
+        <p className="text-base sm:text-lg text-gray-800 dark:text-gray-400 max-w-2xl mx-auto">
           Giới thiệu về blog và tác giả
         </p>
       </div>
@@ -16,17 +16,17 @@ export default function AboutPage() {
             Xin chào! 👋
           </h2>
           <div className="space-y-4">
-            <p className="text-gray-600 dark:text-gray-400">
+            <p className="text-gray-800 dark:text-gray-400">
               Đây là blog cá nhân chia sẻ kinh nghiệm về CTF (Capture The Flag) và bảo mật thông tin.
             </p>
-            <p className="text-gray-600 dark:text-gray-400">
+            <p className="text-gray-800 dark:text-gray-400">
               Tôi tập trung vào lĩnh vực chính:
             </p>
-            <ul className="list-disc list-inside text-gray-600 dark:text-gray-400 space-y-2 ml-4">
+            <ul className="list-disc list-inside text-gray-800 dark:text-gray-400 space-y-2 ml-4">
               <li>Web Exploitation</li>
               
             </ul>
-            <p className="text-gray-600 dark:text-gray-400">
+            <p className="text-gray-800 dark:text-gray-400">
               Mục tiêu của blog là chia sẻ kiến thức, writeup các bài CTF và các nghiên cứu về lỗ hổng bảo mật.
             </p>
           </div>

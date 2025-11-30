@@ -8,30 +8,30 @@ difficulty: 'Medium'
 tags: ['SpEL Injection', 'Command Injection', 'RCE']
 ---
 
-<div style={{ fontSize: '1.1rem' }}>
+<div className="writeup-content-small">
 
-<h1 style={{ textAlign: 'center', color: '#DC321F', fontSize: '2rem', fontWeight: '700' }}>FINOVA BANK</h1>
+<h1 className="writeup-title">FINOVA</h1>
 
 <div style={{ display: 'flex', justifyContent: 'center', margin: '2rem 0' }}>
   <img
     src="/images/writeup/finova_bank/df25-banner.png"
     alt="Ảnh minh họa"
-    style={{ width: '100%', maxWidth: '600px', height: 'auto', borderRadius: '8px' }}
+    style={{ width: '100%', maxWidth: '800px', height: 'auto', borderRadius: '8px' }}
   />
 </div>
 
-<h2 style={{ color: 'white', fontWeight: '700', fontSize: '1.75rem' }}><span style={{ color: '#DC321F', marginLeft: '-1.5rem', marginRight: '0.5rem' }}>#</span> Mở đầu</h2>
+<h2 className="writeup-section-heading"><span className="writeup-hash">#</span> Mở đầu</h2>
 DF Cyber Defend 2025 là sự kiện diễn tập an ninh mạng quy mô lớn trong lĩnh vực tài chính - ngân hàng. Cuộc diễn tập năm nay thu hút sự tham gia của nhiều kỹ sư từ nhiều tổ chức tài chính, ngân hàng lớn và các chuyên gia đầu ngành.
 <br />
 Mình thì chưa có cơ hội để tham gia lúc sự kiện này diễn ra, nhưng về sau ban tổ chức có public challenge thì cũng thử làm xem sao.
 
-<h2 style={{ color: 'white', fontWeight: '700', fontSize: '1.75rem' }}><span style={{ color: '#DC321F', marginLeft: '-1.5rem', marginRight: '0.5rem' }}>#</span> Bắt đầu thôi</h2>
+<h2 className="writeup-section-heading"><span className="writeup-hash">#</span> Bắt đầu thôi</h2>
 Khi vào trang web thì cũng không có chức năng đăng nhập, đăng ký gì hết. Ta được chuyển thẳng vào trang nhìn rất là "tài chính":
 <div style={{ display: 'flex', justifyContent: 'center', margin: '2rem 0' }}>
   <img
     src="/images/writeup/finova_bank/home_page.png"
     alt="Ảnh minh họa"
-    style={{ width: '100%', maxWidth: '600px', height: 'auto', borderRadius: '8px' }}
+    style={{ width: '100%', maxWidth: '800px', height: 'auto', borderRadius: '8px' }}
   />
 </div>
 
@@ -40,7 +40,7 @@ Theo kinh nghiệm thì cứ truyền vào các kí tự đặc biệt `" ' ( )`
   <img
     src="/images/writeup/finova_bank/search.png"
     alt="Ảnh minh họa"
-    style={{ width: '100%', maxWidth: '600px', height: 'auto', borderRadius: '8px' }}
+    style={{ width: '100%', maxWidth: '800px', height: 'auto', borderRadius: '8px' }}
   />
 </div>
 Kết quả đã có lỗi Internal Server Error trả về, lỗi trong param `customerName`:
@@ -48,7 +48,7 @@ Kết quả đã có lỗi Internal Server Error trả về, lỗi trong param `
   <img
     src="/images/writeup/finova_bank/error.png"
     alt="Ảnh minh họa"
-    style={{ width: '100%', maxWidth: '600px', height: 'auto', borderRadius: '8px' }}
+    style={{ width: '100%', maxWidth: '800px', height: 'auto', borderRadius: '8px' }}
   />
 </div>
 Anh lập trình viên lại tạo ra lỗi trong bước đưa dữ liệu về server rồi. Quan sát thấy lỗi `EL1045E`. <br />
@@ -115,7 +115,7 @@ Giờ mình thử 1 payload nào đó xem sao, ví dụ `a" and "1" == "1` thì 
   <img
     src="/images/writeup/finova_bank/error_logic.png"
     alt="Ảnh minh họa"
-    style={{ width: '100%', maxWidth: '600px', height: 'auto', borderRadius: '8px' }}
+    style={{ width: '100%', maxWidth: '800px', height: 'auto', borderRadius: '8px' }}
   />
 </div>
 Vậy là "a" đang được coi như String, điều chỉnh payload thành `a" == "a" and "1" = "1` thì thu được kết quả:
@@ -123,7 +123,7 @@ Vậy là "a" đang được coi như String, điều chỉnh payload thành `a"
   <img
     src="/images/writeup/finova_bank/successfully.png"
     alt="Ảnh minh họa"
-    style={{ width: '100%', maxWidth: '600px', height: 'auto', borderRadius: '8px' }}
+    style={{ width: '100%', maxWidth: '800px', height: 'auto', borderRadius: '8px' }}
   />
 </div>
 Giờ chơi lớn với lệnh command luôn, trong Java mình sử dụng `T(java.lang.Runtime).getRuntime().exec(...)`
@@ -135,7 +135,7 @@ Trong Webhook đã có request tới:
   <img
     src="/images/writeup/finova_bank/webhook.png"
     alt="Ảnh minh họa"
-    style={{ width: '100%', maxWidth: '600px', height: 'auto', borderRadius: '8px' }}
+    style={{ width: '100%', maxWidth: '800px', height: 'auto', borderRadius: '8px' }}
   />
 </div>
 Decode thì đọc được:
@@ -143,7 +143,7 @@ Decode thì đọc được:
   <img
     src="/images/writeup/finova_bank/decode.png"
     alt="Ảnh minh họa"
-    style={{ width: '100%', maxWidth: '600px', height: 'auto', borderRadius: '8px' }}
+    style={{ width: '100%', maxWidth: '800px', height: 'auto', borderRadius: '8px' }}
   />
 </div>
 

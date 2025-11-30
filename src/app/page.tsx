@@ -11,7 +11,7 @@ export default function Home() {
         <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold mb-4 text-transparent bg-clip-text bg-gradient-to-r from-green-400 to-blue-500 dark:from-green-300 dark:to-blue-400">
           CTF Writeups & Security Research
         </h1>
-        <p className="text-base sm:text-lg text-gray-600 dark:text-gray-400 max-w-2xl mx-auto px-4">
+        <p className="text-base sm:text-lg text-gray-800 dark:text-gray-400 max-w-2xl mx-auto px-4">
           Chia sẻ kinh nghiệm về CTF, bảo mật và nghiên cứu lỗ hổng
         </p>
       </div>
@@ -30,7 +30,7 @@ export default function Home() {
                     {title}
                   </h3>
                 </Link>
-                <p className="text-sm sm:text-base text-gray-600 dark:text-gray-400">{description}</p>
+                <p className="text-sm sm:text-base text-gray-800 dark:text-gray-400">{description}</p>
               </div>
             </div>
           ))}

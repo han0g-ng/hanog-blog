@@ -10,7 +10,7 @@ export default function WriteupsPage() {
         <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold mb-4 text-transparent bg-clip-text bg-gradient-to-r from-green-400 to-blue-500 dark:from-green-300 dark:to-blue-400">
           CTF Writeups
         </h1>
-        <p className="text-base sm:text-lg text-gray-600 dark:text-gray-400 max-w-2xl mx-auto px-4">
+        <p className="text-base sm:text-lg text-gray-800 dark:text-gray-400 max-w-2xl mx-auto px-4">
           Tổng hợp các writeup từ các cuộc thi CTF
         </p>
       </div>
@@ -63,7 +63,7 @@ export default function WriteupsPage() {
                   )}
                   
                   {description && (
-                    <p className="text-sm sm:text-base text-gray-600 dark:text-gray-400 mb-3">
+                    <p className="text-sm sm:text-base text-gray-800 dark:text-gray-400 mb-3">
                       {description}
                     </p>
                   )}

@@ -51,7 +51,7 @@ export default async function Writeup({ params }: Props) {
                         {frontmatter.title || slug}
                     </h1>
                     
-                    <div className="flex flex-wrap items-center gap-4 text-sm text-gray-600 dark:text-gray-400">
+                    <div className="flex flex-wrap items-center gap-4 text-sm text-gray-800 dark:text-gray-400">
                         {frontmatter.date && (
                             <span className="flex items-center">
                                 📅 {frontmatter.date}
@@ -89,7 +89,7 @@ export default async function Writeup({ params }: Props) {
                     )}
                     
                     {frontmatter.description && (
-                        <p className="mt-4 text-gray-600 dark:text-gray-400 text-base sm:text-lg">
+                        <p className="mt-4 text-gray-800 dark:text-gray-400 text-base sm:text-lg">
                             {frontmatter.description}
                         </p>
                     )}
@@ -97,15 +97,8 @@ export default async function Writeup({ params }: Props) {
 
                 {/* Content */}
                 <div className="prose prose-lg dark:prose-invert max-w-none
-                    prose-headings:text-gray-900 dark:prose-headings:text-gray-100
-                    prose-p:text-gray-700 dark:prose-p:text-gray-300
-                    prose-a:text-green-500 hover:prose-a:text-green-600
+                    prose-a:text-green-500 hover:prose-a:text-green-800
                     prose-strong:text-gray-900 dark:prose-strong:text-gray-100
-                    prose-code:text-green-600 dark:prose-code:text-green-400
-                    prose-code:bg-gray-100 dark:prose-code:bg-gray-800
-                    prose-code:px-1 prose-code:py-0.5 prose-code:rounded
-                    prose-pre:bg-gray-900 dark:prose-pre:bg-gray-950
-                    prose-pre:text-gray-100
                     prose-img:rounded-lg prose-img:shadow-lg
                 ">
                     {compiledContent}

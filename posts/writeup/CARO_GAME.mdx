@@ -8,26 +8,26 @@ difficulty: 'Medium'
 tags: ['SQLi', 'XSS', 'SSRF', 'WebSocket']
 ---
 
-<div style={{ fontSize: '1.1rem' }}>
+<div className="writeup-content">
 
-<h1 style={{ textAlign: 'center', color: '#DC321F', fontSize: '2rem', fontWeight: '700' }}>CARO GAME</h1>
+<h1 className="writeup-title">CARO GAME</h1>
 
 <div style={{ display: 'flex', justifyContent: 'center', margin: '2rem 0' }}>
   <img
     src="/images/writeup/caro/anh_bat_dau.png"
     alt="Ảnh minh họa"
-    style={{ width: '100%', maxWidth: '600px', height: 'auto', borderRadius: '8px' }}
+    style={{ width: '100%', maxWidth: '800px', height: 'auto', borderRadius: '8px' }}
   />
 </div>
 
-<h2 style={{ color: 'white', fontWeight: '700', fontSize: '1.75rem' }}><span style={{ color: '#DC321F', marginLeft: '-1.5rem', marginRight: '0.5rem' }}>#</span> Mở đầu</h2>
+<h2 className="writeup-section-heading"><span className="writeup-hash">#</span> Mở đầu</h2>
 
 Chúng ta được cung cấp 1 trang web, trong đó có các tính năng cơ bản như `register`, `login`, `create room`. Khi phòng có 2 người trở lên thì có thể tiến hành thi đấu với nhau.
 <div style={{ display: 'flex', justifyContent: 'center', margin: '1rem 0' }}>
   <img
     src="/images/writeup/caro/login.png"
     alt="Ảnh login"
-    style={{ width: '100%', maxWidth: '600px', height: 'auto', borderRadius: '8px' }}
+    style={{ width: '100%', maxWidth: '800px', height: 'auto', borderRadius: '8px' }}
   />
 </div>
 
@@ -35,7 +35,7 @@ Chúng ta được cung cấp 1 trang web, trong đó có các tính năng cơ b
   <img
     src="/images/writeup/caro/room.png"
     alt="Ảnh tạo phòng"
-    style={{ width: '100%', maxWidth: '600px', height: 'auto', borderRadius: '8px' }}
+    style={{ width: '100%', maxWidth: '800px', height: 'auto', borderRadius: '8px' }}
   />
 </div>
 
@@ -43,7 +43,7 @@ Chúng ta được cung cấp 1 trang web, trong đó có các tính năng cơ b
   <img
     src="/images/writeup/caro/game.png"
     alt="Ảnh chơi game"
-    style={{ width: '100%', maxWidth: '600px', height: 'auto', borderRadius: '8px' }}
+    style={{ width: '100%', maxWidth: '800px', height: 'auto', borderRadius: '8px' }}
   />
 </div>
 Ta có trang `profile` cho phép ta thay đổi tên hiển thị, `upload background` (đây là background cho phòng chơi mà ta tạo ở trên). Kế đó là `dashboard` để xem lịch sử thi đấu và kết quả.
@@ -51,18 +51,18 @@ Ta có trang `profile` cho phép ta thay đổi tên hiển thị, `upload backg
   <img
     src="/images/writeup/caro/profile.png"
     alt="Ảnh profile"
-    style={{ width: '100%', maxWidth: '600px', height: 'auto', borderRadius: '8px' }}
+    style={{ width: '100%', maxWidth: '800px', height: 'auto', borderRadius: '8px' }}
   />
 </div>
 <br />
-<h2 style={{ color: 'white', fontWeight: '700', fontSize: '1.75rem' }}><span style={{ color: '#DC321F', marginLeft: '-1.5rem', marginRight: '0.5rem' }}>#</span> Bắt đầu thôi</h2>
+<h2 className="writeup-section-heading"><span className="writeup-hash">#</span> Bắt đầu thôi</h2>
 Thử nghịch với chức năng đăng nhập, theo kinh nghiệm của mình thì nhập các kí hiệu đặc biệt `' " ( ), ...` xem sao.
 
 <div style={{ display: 'flex', justifyContent: 'center', margin: '1rem 0' }}>
   <img
     src="/images/writeup/caro/login_error.png"
     alt="Login error"
-    style={{ width: '100%', maxWidth: '600px', height: 'auto', borderRadius: '8px' }}
+    style={{ width: '100%', maxWidth: '800px', height: 'auto', borderRadius: '8px' }}
   />
 </div>
 <br />
@@ -75,7 +75,7 @@ Như thế, một cách đơn giản ta thử SQLi xem sao, dùng payload `admin
   <img
     src="/images/writeup/caro/flag1.png"
     alt="Flag1"
-    style={{ width: '100%', maxWidth: '600px', height: 'auto', borderRadius: '8px' }}
+    style={{ width: '100%', maxWidth: '800px', height: 'auto', borderRadius: '8px' }}
   />
 </div>
 <br />
@@ -86,7 +86,7 @@ Tạm thời note lỗi này lại và thử các chức năng khác xem sao. Ti
   <img
     src="/images/writeup/caro/html_injection.png"
     alt="html injection"
-    style={{ width: '100%', maxWidth: '600px', height: 'auto', borderRadius: '8px' }}
+    style={{ width: '100%', maxWidth: '800px', height: 'auto', borderRadius: '8px' }}
   />
 </div>
 <br />
@@ -104,7 +104,7 @@ Chợt nhớ ra trong Burp cũng bắt lại được các trao đổi liên qua
   <img
     src="/images/writeup/caro/hacker_websocket.png"
     alt="Flag2"
-    style={{ width: '100%', maxWidth: '600px', height: 'auto', borderRadius: '8px' }}
+    style={{ width: '100%', maxWidth: '800px', height: 'auto', borderRadius: '8px' }}
   />
 </div>
 <br />
@@ -117,7 +117,7 @@ Quan sát nhanh thì thấy có thể update background của các room (mà mì
   <img
     src="/images/writeup/caro/dataUrl.png"
     alt="dataUrl"
-    style={{ width: '100%', maxWidth: '600px', height: 'auto', borderRadius: '8px' }}
+    style={{ width: '100%', maxWidth: '800px', height: 'auto', borderRadius: '8px' }}
   />
 </div>
 <br />
@@ -127,7 +127,7 @@ Quan sát nhanh thì thấy có thể update background của các room (mà mì
   <img
     src="/images/writeup/caro/webshell.png"
     alt="webshell"
-    style={{ width: '100%', maxWidth: '600px', height: 'auto', borderRadius: '8px' }}
+    style={{ width: '100%', maxWidth: '800px', height: 'auto', borderRadius: '8px' }}
   />
 </div>
 <br />
@@ -138,7 +138,7 @@ Thế là web chỉ hiện ra ở dạng text thật, mình thử chỉnh phần
   <img
     src="/images/writeup/caro/url.png"
     alt="url"
-    style={{ width: '100%', maxWidth: '600px', height: 'auto', borderRadius: '8px' }}
+    style={{ width: '100%', maxWidth: '800px', height: 'auto', borderRadius: '8px' }}
   />
 </div>
 <br />
@@ -147,7 +147,7 @@ Thay thành `https://example.com`, reload lại trang profile, nhận thấy 1 g
   <img
     src="/images/writeup/caro/boardBg.png"
     alt="boardBg"
-    style={{ width: '100%', maxWidth: '600px', height: 'auto', borderRadius: '8px' }}
+    style={{ width: '100%', maxWidth: '800px', height: 'auto', borderRadius: '8px' }}
   />
 </div>
 <br />
@@ -157,7 +157,7 @@ Nghĩ ngay đến SSRF, thay url thành `file:///etc/passwd` ta tìm được fl
   <img
     src="/images/writeup/caro/etc_passwd.png"
     alt="Flag3"
-    style={{ width: '100%', maxWidth: '600px', height: 'auto', borderRadius: '8px' }}
+    style={{ width: '100%', maxWidth: '800px', height: 'auto', borderRadius: '8px' }}
   />
 </div>
 <br />
@@ -171,7 +171,7 @@ Nghĩ ngay đến SSRF, thay url thành `file:///etc/passwd` ta tìm được fl
   <img
     src="/images/writeup/caro/proc_self.png"
     alt="proc_self"
-    style={{ width: '100%', maxWidth: '600px', height: 'auto', borderRadius: '8px' }}
+    style={{ width: '100%', maxWidth: '800px', height: 'auto', borderRadius: '8px' }}
   />
 </div>
 <br />
@@ -182,7 +182,7 @@ Hmmm, thế là biết thư mục home của ứng dụng này nằm ở đâu r
   <img
     src="/images/writeup/caro/package_json.png"
     alt="package_json"
-    style={{ width: '100%', maxWidth: '600px', height: 'auto', borderRadius: '8px' }}
+    style={{ width: '100%', maxWidth: '800px', height: 'auto', borderRadius: '8px' }}
   />
 </div>
 <br />
@@ -230,7 +230,7 @@ Coi như đã nắm hầu hết source code trong tay, mình cũng tìm được
   <img
     src="/images/writeup/caro/db_js.png"
     alt="db_js"
-    style={{ width: '100%', maxWidth: '600px', height: 'auto', borderRadius: '8px' }}
+    style={{ width: '100%', maxWidth: '800px', height: 'auto', borderRadius: '8px' }}
   />
 </div>
 <br />
