@@ -2,6 +2,7 @@ import { getWriteupData, getAllWriteupIds } from '@/lib/writeups';
 import { compileMDX } from 'next-mdx-remote/rsc';
 import rehypePrism from 'rehype-prism-plus';
 import 'prismjs/themes/prism-tomorrow.css';
+import ExportPDFButton from '@/components/ExportPDFButton';
 
 type Props = {
     params: Promise<{ slug: string }>;
@@ -47,9 +48,17 @@ export default async function Writeup({ params }: Props) {
             <div className="mx-auto">
                 {/* Header */}
                 <div className="mb-8">
-                    <h1 className="text-3xl sm:text-4xl md:text-5xl font-extrabold tracking-tight mb-4 text-gray-900 dark:text-gray-100">
-                        {frontmatter.title || slug}
-                    </h1>
+                    <div className="flex justify-between items-start mb-4">
+                        <h1 className="text-3xl sm:text-4xl md:text-5xl font-extrabold tracking-tight text-gray-900 dark:text-gray-100 flex-1">
+                            {frontmatter.title || slug}
+                        </h1>
+                        <div className="ml-4">
+                            <ExportPDFButton 
+                                title={frontmatter.title || slug} 
+                                contentId="writeup-content"
+                            />
+                        </div>
+                    </div>
                     
                     <div className="flex flex-wrap items-center gap-4 text-sm text-gray-800 dark:text-gray-400">
                         {frontmatter.date && (
@@ -96,11 +105,14 @@ export default async function Writeup({ params }: Props) {
                 </div>
 
                 {/* Content */}
-                <div className="prose prose-lg dark:prose-invert max-w-none
-                    prose-a:text-green-500 hover:prose-a:text-green-800
-                    prose-strong:text-gray-900 dark:prose-strong:text-gray-100
-                    prose-img:rounded-lg prose-img:shadow-lg
-                ">
+                <div 
+                    id="writeup-content"
+                    className="prose prose-lg dark:prose-invert max-w-none
+                        prose-a:text-green-500 hover:prose-a:text-green-800
+                        prose-strong:text-gray-900 dark:prose-strong:text-gray-100
+                        prose-img:rounded-lg prose-img:shadow-lg
+                    "
+                >
                     {compiledContent}
                 </div>
             </div>
