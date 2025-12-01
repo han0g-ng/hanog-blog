@@ -25,19 +25,15 @@ const ExportPDFButton: React.FC<ExportPDFButtonProps> = ({
         return;
       }
 
-      // Tạo bản sao của element để xử lý
       const clonedElement = element.cloneNode(true) as HTMLElement;
-      clonedElement.style.width = '210mm'; // A4 width
+      clonedElement.style.width = '210mm';
       clonedElement.style.padding = '20mm';
       clonedElement.style.backgroundColor = 'white';
       clonedElement.style.color = 'black';
-      
-      // Thêm vào body tạm thời (ẩn)
       clonedElement.style.position = 'absolute';
       clonedElement.style.left = '-9999px';
       document.body.appendChild(clonedElement);
 
-      // Chuyển đổi sang canvas
       const canvas = await html2canvas(clonedElement, {
         scale: 2,
         useCORS: true,
@@ -45,32 +41,63 @@ const ExportPDFButton: React.FC<ExportPDFButtonProps> = ({
         backgroundColor: '#ffffff',
       });
 
-      // Xóa element tạm
       document.body.removeChild(clonedElement);
 
       const imgData = canvas.toDataURL('image/png');
-      
-      // Kích thước A4
       const pdf = new jsPDF('p', 'mm', 'a4');
       const pdfWidth = pdf.internal.pageSize.getWidth();
       const pdfHeight = pdf.internal.pageSize.getHeight();
       
-      // Lề cho header và footer
       const marginTop = 20;
-      const marginBottom = 20; 
+      const marginBottom = 20;
       const marginSide = 20;
-      
-      // Chiều cao vùng nội dung (không tính header/footer)
       const contentAreaHeight = pdfHeight - marginTop - marginBottom;
-      
       const imgWidth = pdfWidth - (marginSide * 2);
-      const imgHeight = (canvas.height * imgWidth) / canvas.width;
-      
-      // Tính tỉ lệ pixel trên canvas tương ứng với mm trên PDF
       const pixelPerMm = canvas.width / imgWidth;
       const contentHeightInPixels = contentAreaHeight * pixelPerMm;
       
-      let currentY = 0; // Vị trí hiện tại trên canvas (pixel)
+      // Hàm tìm điểm ngắt tốt (tránh cắt giữa chữ)
+      const findGoodBreakPoint = (startY: number, idealHeight: number): number => {
+        const ctx = canvas.getContext('2d');
+        if (!ctx) return idealHeight;
+        
+        const searchRange = Math.min(idealHeight * 0.15, 50);
+        let bestBreak = idealHeight;
+        let maxWhiteSpace = 0;
+        
+        for (let offset = 0; offset < searchRange; offset++) {
+          const y = Math.floor(startY + idealHeight - offset);
+          if (y >= canvas.height) continue;
+          
+          const imageData = ctx.getImageData(0, y, canvas.width, 1);
+          let whiteCount = 0;
+          
+          for (let i = 0; i < imageData.data.length; i += 4) {
+            const r = imageData.data[i];
+            const g = imageData.data[i + 1];
+            const b = imageData.data[i + 2];
+            const brightness = (r + g + b) / 3;
+            
+            if (brightness > 240) {
+              whiteCount++;
+            }
+          }
+          
+          const whitePercentage = whiteCount / (canvas.width / 4);
+          if (whitePercentage > maxWhiteSpace) {
+            maxWhiteSpace = whitePercentage;
+            bestBreak = idealHeight - offset;
+          }
+          
+          if (whitePercentage > 0.9) {
+            break;
+          }
+        }
+        
+        return bestBreak;
+      };
+      
+      let currentY = 0;
       let pageNumber = 1;
       
       while (currentY < canvas.height) {
@@ -78,33 +105,30 @@ const ExportPDFButton: React.FC<ExportPDFButtonProps> = ({
           pdf.addPage();
         }
         
-        // Tính chiều cao cần cắt từ canvas (pixel)
-        const sliceHeight = Math.min(contentHeightInPixels, canvas.height - currentY);
+        const idealSliceHeight = Math.min(contentHeightInPixels, canvas.height - currentY);
+        const actualSliceHeight = currentY + idealSliceHeight >= canvas.height 
+          ? idealSliceHeight 
+          : findGoodBreakPoint(currentY, idealSliceHeight);
         
-        // Tạo canvas tạm để chứa phần cắt
         const tempCanvas = document.createElement('canvas');
         tempCanvas.width = canvas.width;
-        tempCanvas.height = sliceHeight;
+        tempCanvas.height = actualSliceHeight;
         
         const tempCtx = tempCanvas.getContext('2d');
         if (tempCtx) {
-          // Vẽ phần cần thiết từ canvas gốc
           tempCtx.drawImage(
             canvas,
-            0, currentY,           // Vị trí bắt đầu cắt trên canvas gốc
-            canvas.width, sliceHeight,  // Kích thước vùng cắt
-            0, 0,                  // Vị trí vẽ trên canvas tạm
-            canvas.width, sliceHeight   // Kích thước vẽ
+            0, currentY,
+            canvas.width, actualSliceHeight,
+            0, 0,
+            canvas.width, actualSliceHeight
           );
           
           const sliceData = tempCanvas.toDataURL('image/png');
-          const sliceHeightMm = sliceHeight / pixelPerMm;
-          
-          // Thêm ảnh vào vùng nội dung (tránh header/footer)
+          const sliceHeightMm = actualSliceHeight / pixelPerMm;
           pdf.addImage(sliceData, 'PNG', marginSide, marginTop, imgWidth, sliceHeightMm);
         }
         
-        // Thêm số trang ở góc phải cuối trang
         pdf.setFontSize(10);
         pdf.setTextColor(120);
         pdf.text(
@@ -114,11 +138,10 @@ const ExportPDFButton: React.FC<ExportPDFButtonProps> = ({
           { align: 'right' }
         );
         
-        currentY += sliceHeight;
+        currentY += actualSliceHeight;
         pageNumber++;
       }
       
-      // Lưu file
       const fileName = `${title.replace(/[^a-z0-9]/gi, '_').toLowerCase()}.pdf`;
       pdf.save(fileName);
       
