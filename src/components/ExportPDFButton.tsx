@@ -4,12 +4,10 @@ import React from 'react';
 
 interface ExportPDFButtonProps {
   title: string;
-  contentId?: string;
 }
 
 const ExportPDFButton: React.FC<ExportPDFButtonProps> = ({ 
-  title, 
-  contentId = 'writeup-content' 
+  title
 }) => {
   const [isExporting, setIsExporting] = React.useState(false);
 

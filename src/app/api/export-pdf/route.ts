@@ -11,7 +11,7 @@ export async function POST(request: NextRequest) {
 
     // Launch browser
     const browser = await puppeteer.launch({
-      headless: 'new',
+      headless: true,
       args: ['--no-sandbox', '--disable-setuid-sandbox']
     });
 
@@ -134,7 +134,7 @@ export async function POST(request: NextRequest) {
       : 'export.pdf';
 
     // Return PDF as response
-    return new NextResponse(pdfBuffer, {
+    return new NextResponse(Buffer.from(pdfBuffer), {
       headers: {
         'Content-Type': 'application/pdf',
         'Content-Disposition': `attachment; filename="${safeFilename}"`

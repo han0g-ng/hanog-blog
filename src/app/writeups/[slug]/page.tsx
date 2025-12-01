@@ -55,8 +55,7 @@ export default async function Writeup({ params }: Props) {
                         </h1>
                         <div className="ml-4">
                             <ExportPDFButton 
-                                title={frontmatter.title || slug} 
-                                contentId="writeup-content"
+                                title={frontmatter.title || slug}
                             />
                         </div>
                     </div>
