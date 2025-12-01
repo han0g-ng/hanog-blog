@@ -45,7 +45,7 @@ export default async function Post({ params }: Props) {
 
     // BƯỚC 3: Trả về JSX để render ra trang (phần này phải ở BÊN TRONG hàm Post)
     return (
-        <article className="container mx-auto px-4 py-8 prose lg:prose-xl">
+        <article className="max-w-3xl mx-auto px-4 py-8 prose lg:prose-xl">
             <h1 className="text-4xl font-extrabold tracking-tight mb-2">{frontmatter.title}</h1>
             <p className="text-gray-500 mb-8">{frontmatter.date}</p>
             <div>

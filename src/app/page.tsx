@@ -6,7 +6,7 @@ export default function Home() {
   const allPostsData = getSortedPostsData();
 
   return (
-    <main className="container mx-auto px-4 py-8">
+    <main className="max-w-3xl mx-auto px-4 py-8">
       <div className="mb-12 text-center">
         <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold mb-4 text-transparent bg-clip-text bg-gradient-to-r from-green-400 to-blue-500 dark:from-green-300 dark:to-blue-400">
           CTF Writeups & Security Research

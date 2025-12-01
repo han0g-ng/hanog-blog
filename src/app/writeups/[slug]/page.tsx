@@ -43,8 +43,8 @@ export default async function Writeup({ params }: Props) {
     });
 
     return (
-        <article className="container mx-auto px-4 py-8">
-            <div className="max-w-4xl mx-auto">
+        <article className="max-w-3xl mx-auto px-4 py-8">
+            <div className="mx-auto">
                 {/* Header */}
                 <div className="mb-8">
                     <h1 className="text-3xl sm:text-4xl md:text-5xl font-extrabold tracking-tight mb-4 text-gray-900 dark:text-gray-100">

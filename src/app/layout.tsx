@@ -6,14 +6,14 @@ import ThemeProvider from "@/components/ThemeProvider";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 
-import { Geist, Geist_Mono } from "next/font/google";
+import { Geist, JetBrains_Mono } from "next/font/google";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
   subsets: ["latin"],
 });
 
-const geistMono = Geist_Mono({
+const jetBrainsMono = JetBrains_Mono({
   variable: "--font-geist-mono",
   subsets: ["latin"],
 });
@@ -31,7 +31,7 @@ export default function RootLayout({
   return (
     <html lang="vi" suppressHydrationWarning>
       <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased min-h-screen bg-white text-slate-900 dark:bg-[#1D1F21] dark:text-slate-50 transition-colors duration-200`}
+        className={`${geistSans.variable} ${jetBrainsMono.variable} antialiased min-h-screen bg-white text-slate-900 dark:bg-[#1D1F21] dark:text-slate-50 transition-colors duration-200`}
       >
         <ThemeProvider
           attribute="class"
@@ -41,7 +41,7 @@ export default function RootLayout({
         >
           <div className="flex min-h-screen flex-col">
             <Header />
-            <main className="container mx-auto flex-grow px-4 py-8">
+            <main className="flex-grow px-4 py-8">
               {children}
             </main>
             <Footer />
