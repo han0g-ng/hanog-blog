@@ -116,7 +116,7 @@ Vậy mấu chốt của bài này là ở đâu?? Quan sát thêm thì thấy l
 <br />
 
 Như thế, có lẽ nào lỗi nằm ở các hàm `parse` kia? Bạn có thể đọc đoạn code sau để hiểu rõ hơn phân tích trên của mình.
-```
+```javascript
 app.post('/api/gamble', (req, res) => {
     const { currency, amount } = req.body;
     
@@ -163,7 +163,7 @@ app.post('/api/gamble', (req, res) => {
 });
 ```
 
-```
+```javascript
 app.post('/api/convert', (req, res) => {
     let { amount } = req.body;
 
@@ -285,7 +285,7 @@ Mình quá may mắn nên đánh 40 lần là ăn. Flag: `EPFL{we_truly_live_in_
 
 Đoạn code python để chạy thử:
 
-```
+```python
 import requests
 
 URL = "https://chall.polygl0ts.ch:8148/"
