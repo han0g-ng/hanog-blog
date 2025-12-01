@@ -71,6 +71,9 @@ pre {
   border-left: 4px solid #DC321F !important;
   margin: 1rem 0 !important;
   background-color: #f5f5f5 !important;
+  white-space: pre-wrap !important;
+  word-wrap: break-word !important;
+  overflow-wrap: break-word !important;
 }
 
 .dark pre {
@@ -83,6 +86,9 @@ pre code {
   background-color: transparent !important;
   color: #24292e !important;
   border-radius: 0 !important;
+  white-space: pre-wrap !important;
+  word-wrap: break-word !important;
+  overflow-wrap: break-word !important;
 }
 
 .dark pre code {
@@ -271,4 +277,108 @@ code {
     transform: translateY(0);
   }
 }
+
+/* Table of Contents */
+.toc-container {
+  background: linear-gradient(135deg, rgba(220, 50, 31, 0.05) 0%, rgba(220, 50, 31, 0.02) 100%);
+  border: 1px solid rgba(220, 50, 31, 0.2);
+  border-left: 4px solid #DC321F;
+  border-radius: 8px;
+  padding: 1.5rem;
+  margin: 2rem 0;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+}
+
+.dark .toc-container {
+  background: linear-gradient(135deg, rgba(220, 50, 31, 0.1) 0%, rgba(220, 50, 31, 0.05) 100%);
+  border-color: rgba(220, 50, 31, 0.3);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+}
+
+.toc-title {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: #DC321F;
+  margin: 0 0 1rem 0;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.dark .toc-title {
+  color: #ff6b5a;
+}
+
+.toc-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.toc-item {
+  margin: 0.5rem 0;
+  transition: all 0.2s ease;
+}
+
+.toc-level-1 {
+  padding-left: 0;
+  font-weight: 600;
+  font-size: 1.05rem;
+}
+
+.toc-level-2 {
+  padding-left: 1rem;
+  font-weight: 500;
+}
+
+.toc-level-3 {
+  padding-left: 2rem;
+  font-size: 0.95rem;
+}
+
+.toc-level-4 {
+  padding-left: 3rem;
+  font-size: 0.9rem;
+  opacity: 0.8;
+}
+
+.toc-item a {
+  color: inherit;
+  text-decoration: none;
+  transition: all 0.2s ease;
+  display: block;
+  padding: 0.35rem 0.5rem;
+  border-radius: 4px;
+  position: relative;
+}
+
+.toc-item a:hover {
+  color: #DC321F;
+  background: rgba(220, 50, 31, 0.05);
+  transform: translateX(4px);
+}
+
+.dark .toc-item a:hover {
+  color: #ff6b5a;
+  background: rgba(220, 50, 31, 0.15);
+}
+
+.toc-item a.active {
+  color: #DC321F;
+  background: rgba(220, 50, 31, 0.1);
+  font-weight: 600;
+  border-left: 3px solid #DC321F;
+  padding-left: calc(0.5rem + 3px);
+}
+
+.dark .toc-item a.active {
+  color: #ff6b5a;
+  background: rgba(220, 50, 31, 0.2);
+  border-left-color: #ff6b5a;
+}
+
+.toc-item.active {
+  margin-left: 4px;
+}
+
 

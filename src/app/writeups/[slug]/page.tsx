@@ -3,6 +3,7 @@ import { compileMDX } from 'next-mdx-remote/rsc';
 import rehypePrism from 'rehype-prism-plus';
 import 'prismjs/themes/prism-tomorrow.css';
 import ExportPDFButton from '@/components/ExportPDFButton';
+import TableOfContents from '@/components/TableOfContents';
 
 type Props = {
     params: Promise<{ slug: string }>;
@@ -104,10 +105,13 @@ export default async function Writeup({ params }: Props) {
                     )}
                 </div>
 
+                {/* Table of Contents */}
+                <TableOfContents />
+
                 {/* Content */}
                 <div 
                     id="writeup-content"
-                    className="prose prose-lg dark:prose-invert max-w-none
+                    className="writeup-content-small prose prose-lg dark:prose-invert max-w-none
                         prose-a:text-green-500 hover:prose-a:text-green-800
                         prose-strong:text-gray-900 dark:prose-strong:text-gray-100
                         prose-img:rounded-lg prose-img:shadow-lg
