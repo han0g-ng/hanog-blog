@@ -100,7 +100,7 @@ Google và GPT một lúc thì mình được kết quả đây là đoạn code
   />
 </div>
 
-2. `/api/v2/plugins` -> endpoint này cho phép sử dụng cả 2 phương thức là GET và POST, rõ ràng là đẻ xem hay tải lên các plugin nào đó. Để truy cập các endpoint này thì ta cần đăng nhập với tư cách admin.
+2. `/api/v2/plugins` -> endpoint này cho phép sử dụng cả 2 phương thức là GET và POST, rõ ràng là để xem hay tải lên các plugin nào đó. Để truy cập các endpoint này thì ta cần đăng nhập với tư cách admin.
 
 3. `/api/v2/plugins/execute` -> đây khá chắc là nơi để thực hiện RCE (Flag 5) rồi. Nhưng mà để lấy được flag cuối đâu có dễ thế, ta vẫn cần quyền admin.
 
@@ -193,7 +193,7 @@ Ta dễ dàng tìm được flag 1: `FLAG{ab413281962b????????51c05d2f2}`
 <br />
 
 Quan sát thêm thì cũng không thấy có chức năng gì đặc biệt nữa.<br />
-Theo kinh nghiệm mình thử mở mấy cái ảnh trong tab mới xem sao. và thu được `/api/v2/image/resize?image=http://webchallenge/files/images/products/3d46bb95acc186a7.png&size=large`.
+Theo kinh nghiệm mình thử mở mấy cái ảnh trong tab mới xem sao, và thu được `/api/v2/image/resize?image=http://webchallenge/files/images/products/3d46bb95acc186a7.png&size=large`.
 <br />
 Nhìn cũng khá giống SSRF rồi đó, thay phần url bên trong thành http://example.com thì thấy nó lấy được nội dung trang web về thật. Thử với `file:///etc/passwd` mình thu được kết quả:
 <div style={{ display: 'flex', justifyContent: 'center', margin: '2rem 0' }}>

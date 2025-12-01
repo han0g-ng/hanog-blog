@@ -69,7 +69,7 @@ Thử nghịch với chức năng đăng nhập, theo kinh nghiệm của mình 
 
 À há, thử với `display name`, `password` một hồi với đủ payload thì không thấy gì đặc biệt, nhưng thử với `username` thì thấy bão lỗi. Lỗi thế này khả năng do anh lập trình viên chưa có cơ chế sanitize hợp lý.
 <br />
-Như thế, một cách đơn giản ta thử SQLi xem sao, dùng payload `admin' OR 1 = 1#` thì đăng nhập vô trang admin được thật, ở đây mình tìm được flag đầu tiên `FLAG{c8166c44e2????b60c2540a0b01efe828}`
+Như thế, một cách đơn giản ta thử SQLi xem sao, dùng payload `admin' OR 1 = 1#` thì đăng nhập vô trang admin được thật, ở đây mình tìm được flag đầu tiên `FLAG{c8166c44e2????b60c2540a0b01efe828}`.
 
 <div style={{ display: 'flex', justifyContent: 'center', margin: '1rem 0' }}>
   <img
@@ -109,7 +109,7 @@ Chợt nhớ ra trong Burp cũng bắt lại được các trao đổi liên qua
 </div>
 <br />
 
-Nghịch một hồi với các chức năng tạo phòng, chơi game cũng chẳng thấy gì nữa, mình tiếp tục với trang `profile`
+Nghịch một hồi với các chức năng tạo phòng, chơi game cũng chẳng thấy gì nữa, mình tiếp tục với trang `profile`.
 
 Quan sát nhanh thì thấy có thể update background của các room (mà mình tạo) thông qua 2 cơ chế:
 1. 1.Nhập thẳng nội dung file vào theo đúng cấu trúc
@@ -162,7 +162,7 @@ Nghĩ ngay đến SSRF, thay url thành `file:///etc/passwd` ta tìm được fl
 </div>
 <br />
 
-Đến đây mình nghĩ là coi như đã giải được challenge này dễ dàng do gần như đã thành whitebox. Tuy nhiên mặc dù có thể đọc các file tùy ý nhưng có một vấn đề lớn, đó là: "Làm sao để tìm được đường dẫn chính xác của các file mà đọc???"
+Đến đây mình nghĩ là coi như đã giải được challenge này dễ dàng do gần như đã thành whitebox. Tuy nhiên mặc dù có thể đọc các file tùy ý nhưng có một vấn đề lớn, đó là: "Làm sao để tìm được đường dẫn chính xác của các file mà đọc???".
 <br />
 
 Đành phải thử các file cấu hình của hệ thống thôi, để ý trong file `/etc/passwd` trên dòng thứ 2 từ dưới lên, ứng dụng sử dụng Nodejs. Nhưng trước tiên theo kinh nghiệm mình thử `/proc/self/environ` xem sao.

@@ -39,7 +39,7 @@ Khi nhấn vô link challenge ta được đưa tới 1 trang web đánh bạc:
 
 Về cơ bản thì trang có những nội dung sau:
 <br />
-Bạn có 2 loại tiền chính trong ví, đó là `coins` và `USD`. Tuy nhiên trong giao diện web sẽ hiển thị đơn vị là microcoins (tức là 1 coins = 1000000 microcoins). 
+Bạn có 2 loại tiền chính trong ví, đó là `coins` và `USD`. Tuy nhiên, trong giao diện web sẽ hiển thị đơn vị là microcoins (tức là 1 coins = 1000000 microcoins). 
 <br />
 Tiếp theo, bạn có thể đánh bạc. Có tùy chọn đơn vị là microcoins và USD (ban đầu USD là 0 nên không đánh được). Nếu số tiền bạn nhập vào hợp lệ thì tiến hành đánh bạc.
 
@@ -55,7 +55,7 @@ Tỉ lệ ăn là 9%, nếu thắng, bạn được gấp 10 số tiền cược
 
 <br />
 Tiếp theo, khi có lượng coins đủ lớn. Bạn có thể đổi coins ra thành USD và cầm về (chắc rút để tiêu...). <br />
-Để đổi được ra USD, bạn cần có nhập lượng coins là số nguyên (coins chứ không phải microcoins nhé). Với mỗi coin thì đổi được 0.01 USD. 
+Để đổi được ra USD, bạn cần có nhập lượng coins là số nguyên (coins chứ không phải microcoins nhé). Với mỗi coin, ta đổi được 0.01 USD. 
 
 <div style={{ display: 'flex', justifyContent: 'center', margin: '2rem 0' }}>
   <img
@@ -204,7 +204,7 @@ Nếu số rất nhỏ (5e-7 chẳng hạn) -> ToString(5e-7) -> "5e-7" (chuyể
 
 Rõ ràng, nếu cứ đánh bạc bình thường thì mình sẽ chẳng bao giờ có nổi 1 coin và đổi ra USD mất (vì ban đầu có 0.00001 coin). Tệ hơn, số tiền ăn và tỉ lệ thắng kết hợp lại, tính theo xác suất cơ bản thì càng đánh càng lỗ.
 <br />
-Nếu chơi tất tay với 0.00001 coin ban đầu, giả sử đánh ăn liên tiếp thì mình cần đánh tận 8 lần. Với xác suất thắng 9% (0.09) thì tỉ lệ được 1 lần thắng 8 ván liên tiếp là 0.09^8 = 4.3046721e-9 -> Đánh tận 232305732 lần thì có cơ may ăn một lần.
+Nếu chơi tất tay với 0.00001 coin ban đầu, giả sử đánh ăn liên tiếp thì mình cần đánh tận 8 lần. Với xác suất thắng 9% (0.09) thì tỉ lệ được một lần thắng 8 ván liên tiếp là 0.09^8 = 4.3046721e-9 -> Đánh tận 232305732 lần thì có cơ may ăn một lần.
 
 
 <h2 className="writeup-section-heading"><span className="writeup-hash">#</span> Hack thôi</h2>
@@ -271,7 +271,7 @@ Tóm lại làm như sau:
 5. Cầm số tiền này đánh all in liên tiếp cho đến khi được 90 USD.
 6. Vì all in nên cứ thua là hết sạch tiền -> reset session và quay lại bước 1.
 ```
-Xác xuất để thắng 3 lần liên tiếp là 0.09^3 -> đánh khoảng 1400 lần thì ăn 1, khả thì hơn lúc nãy rất nhiều rồi đúng không nào.
+Xác xuất để thắng 3 lần liên tiếp là 0.09^3 -> đánh khoảng 1400 lần thì ăn 1, khả thi hơn lúc nãy rất nhiều rồi đúng không nào.
 
 <div style={{ display: 'flex', justifyContent: 'center', margin: '2rem 0' }}>
   <img
