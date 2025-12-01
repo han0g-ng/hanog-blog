@@ -21,19 +21,26 @@ export default function Home() {
           <span className="border-b-4 border-green-400">Bài viết mới nhất</span>
         </h2>
         <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-          {allPostsData.map(({ id, date, title, description }) => (
-            <div key={id} className="bg-white dark:bg-gray-800 rounded-lg shadow-lg overflow-hidden hover:shadow-xl transition-shadow duration-300">
-              <div className="p-6">
-                <p className="text-sm text-green-500 dark:text-green-400 mb-2">{date}</p>
-                <Link href={`/posts/${id}`} className="block">
-                  <h3 className="text-lg sm:text-xl font-bold mb-2 text-gray-800 dark:text-gray-200 hover:text-green-500 dark:hover:text-green-400 transition-colors">
-                    {title}
-                  </h3>
-                </Link>
-                <p className="text-sm sm:text-base text-gray-800 dark:text-gray-400">{description}</p>
+          {allPostsData.map(({ id, date, title, description }) => {
+            // Determine the correct URL based on the post location
+            const postUrl = id === 'hello-world' 
+              ? `/posts/${id}` 
+              : `/writeups/${id.replace('writeup/', '')}`;
+            
+            return (
+              <div key={id} className="bg-white dark:bg-gray-800 rounded-lg shadow-lg overflow-hidden hover:shadow-xl transition-shadow duration-300 aspect-square flex flex-col">
+                <div className="p-6 flex flex-col h-full">
+                  <p className="text-sm text-green-500 dark:text-green-400 mb-2 flex-shrink-0">{date}</p>
+                  <Link href={postUrl} className="block flex-grow flex flex-col">
+                    <h3 className="text-lg sm:text-xl font-bold mb-2 text-gray-800 dark:text-gray-200 hover:text-green-500 dark:hover:text-green-400 transition-colors line-clamp-2 flex-shrink-0">
+                      {title}
+                    </h3>
+                    <p className="text-sm sm:text-base text-gray-800 dark:text-gray-400 line-clamp-4 flex-grow overflow-hidden">{description}</p>
+                  </Link>
+                </div>
               </div>
-            </div>
-          ))}
+            );
+          })}
         </div>
       </section>
     </main>

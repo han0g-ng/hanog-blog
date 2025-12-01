@@ -1,4 +1,4 @@
-# Hanog CTF Blog
+# Hanog Blog
 
 Blog cá nhân chia sẻ kinh nghiệm về CTF (Capture The Flag) và bảo mật thông tin.
 

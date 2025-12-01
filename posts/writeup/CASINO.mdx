@@ -19,6 +19,7 @@ tags: ['Business Logic Error', 'Type Juggling']
     style={{ width: '100%', maxWidth: '800px', height: 'auto', borderRadius: '8px' }}
   />
 </div>
+
 <h2 className="writeup-section-heading"><span className="writeup-hash">#</span> Mở đầu</h2>
 
 LakeCTF là một giải được tổ chức bởi CTF **polygl0ts**, thường diễn ra theo format Jeopardy, gồm nhiều danh mục như Web, Pwn, Misc,...
@@ -203,14 +204,15 @@ Nếu số rất nhỏ (5e-7 chẳng hạn) -> ToString(5e-7) -> "5e-7" (chuyể
 <h2 className="writeup-section-heading"><span className="writeup-hash">#</span> Nhìn lại vấn đề</h2>
 
 Rõ ràng, nếu cứ đánh bạc bình thường thì mình sẽ chẳng bao giờ có nổi 1 coin và đổi ra USD mất (vì ban đầu có 0.00001 coin). Tệ hơn, số tiền ăn và tỉ lệ thắng kết hợp lại, tính theo xác suất cơ bản thì càng đánh càng lỗ.
-<br />
-Nếu chơi tất tay với 0.00001 coin ban đầu, giả sử đánh ăn liên tiếp thì mình cần đánh tận 8 lần. Với xác suất thắng 9% (0.09) thì tỉ lệ được một lần thắng 8 ván liên tiếp là 0.09^8 = 4.3046721e-9 -> Đánh tận 232305732 lần thì có cơ may ăn một lần.
 
+<br />
+
+Nếu chơi tất tay với 0.00001 coin ban đầu, giả sử đánh ăn liên tiếp thì mình cần đánh tận 8 lần. Với xác suất thắng 9% (0.09) thì tỉ lệ được một lần thắng 8 ván liên tiếp là 0.09^8 = 4.3046721e-9 -> Đánh tận 232305732 lần thì có cơ may ăn một lần.
 
 <h2 className="writeup-section-heading"><span className="writeup-hash">#</span> Hack thôi</h2>
 
 Từ lỗi `parseInt` trong `/api/convert`, nếu số dư tài khoản (`wallet.coins`) đủ bé để đưa được về dạng khoa học (tức nhỏ hơn 10^-6). Giả sử ở dạng `A.xxxxx e-z` đi (ví dụ 8.999e-7) (trong đó A là số nguyên từ 0 đến 9). 
-```
+```javascript
 const wallet = req.session.wallet;
 const coinBalance = parseInt(wallet.coins);
 ```
@@ -263,7 +265,7 @@ Tương tự suy nghĩ ở phần "Đặt vấn đề". Giờ ta có 0.09 USD, �
 <br />
 Tóm lại làm như sau:
 
-```
+```plaintext
 1. Đánh bạc với 9.1 microcoin
 2. Nếu thắng thì reset session và đánh lại.
 3. Nếu thua thì ta có số tiền như ảnh trên (0.900000000000016 microcoins).

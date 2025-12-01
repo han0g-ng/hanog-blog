@@ -22,7 +22,9 @@ tags: ['SQLi', 'SSRF', 'File Upload', 'JWT', 'RCE']
 
 <h2 className="writeup-section-heading"><span className="writeup-hash">#</span> Mở đầu</h2>
 
-Hôm nay chúng ta sẽ đến với một challenge khá thú vị.<br />
+Hôm nay chúng ta sẽ đến với một challenge khá thú vị.
+
+<br />
 Có 5 flag phải tìm:
 ```plaintext
 flag1: khi mua thành công flag
@@ -31,7 +33,9 @@ flag3: order detail của user conmeo
 flag4: trong database
 flag5: trong thư mục / ở server, tức yêu cầu phải rce được server
 ```
+
 <h2 className="writeup-section-heading"><span className="writeup-hash">#</span> Bắt đầu thôi</h2>
+
 Ban đầu khi mở trang web, ta thấy có nội dung đăng nhập, tạo tài khoản mới, quên mật khẩu.
 <div style={{ display: 'flex', justifyContent: 'center', margin: '2rem 0' }}>
   <img
@@ -263,7 +267,7 @@ Giờ mình đã truy cập được admin panel, trong đó có phần `plugin`
   />
 </div>
 Ấn vào chạy thử plugin thì không thấy có gì xuất hiện ngoài thông báo thành công, cũng không tìm thấy cách nào để đưa plugin mới lên cả (nút thêm đã bị vô hiệu hóa). Mình tải plugin-example về xem sao:
-```
+```javascript
 module.exports = {
   execute: () => {
     console.log('Hello from the plugin!');

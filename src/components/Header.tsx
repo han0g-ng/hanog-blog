@@ -8,12 +8,12 @@ const Header = () => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   return (
-    <header className="bg-white/80 backdrop-blur-sm text-slate-800 shadow-md dark:bg-gray-900/80 dark:text-white dark:border-b dark:border-gray-700 sticky top-0 z-50">
+    <header className="no-print bg-white/80 backdrop-blur-sm text-slate-800 shadow-md dark:bg-gray-900/80 dark:text-white dark:border-b dark:border-gray-700 sticky top-0 z-50">
       <div className="container mx-auto px-4 py-4">
         <div className="flex justify-between items-center">
           <Link href="/" className="flex items-center space-x-2">
             <span className="text-2xl font-bold bg-gradient-to-r from-green-400 to-blue-500 bg-clip-text text-transparent hover:opacity-80 transition-opacity">
-              Hanog CTF
+              Hanog
             </span>
           </Link>
           

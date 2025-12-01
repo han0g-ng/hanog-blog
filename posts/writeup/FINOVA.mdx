@@ -21,11 +21,13 @@ tags: ['SpEL Injection', 'Command Injection', 'RCE']
 </div>
 
 <h2 className="writeup-section-heading"><span className="writeup-hash">#</span> Mở đầu</h2>
+
 DF Cyber Defend 2025 là sự kiện diễn tập an ninh mạng quy mô lớn trong lĩnh vực tài chính - ngân hàng. Cuộc diễn tập năm nay thu hút sự tham gia của nhiều kỹ sư từ nhiều tổ chức tài chính, ngân hàng lớn và các chuyên gia đầu ngành.
 <br />
 Mình thì chưa có cơ hội để tham gia lúc sự kiện này diễn ra, nhưng về sau ban tổ chức có public challenge thì cũng thử làm xem sao.
 
 <h2 className="writeup-section-heading"><span className="writeup-hash">#</span> Bắt đầu thôi</h2>
+
 Khi vào trang web thì cũng không có chức năng đăng nhập, đăng ký gì hết. Ta được chuyển thẳng vào trang nhìn rất là "tài chính":
 <div style={{ display: 'flex', justifyContent: 'center', margin: '2rem 0' }}>
   <img
@@ -54,7 +56,7 @@ Kết quả đã có lỗi Internal Server Error trả về, lỗi trong param `
 Anh lập trình viên lại tạo ra lỗi trong bước đưa dữ liệu về server rồi. Quan sát thấy lỗi `EL1045E`. <br />
 Tra cứu một hồi thì đây là lỗi trong `Spring Expression Language` (SpEL), một ngôn ngữ biểu thức được sử dụng trong Java, cụ thể trong Spring Framework. <br />
 SpEL cho phép viết các biểu thức động trong code hoặc file cấu hình Spring:
-```
+```java
 @Value("#{user.name}")
 @Value("#{T(Math).random()}")
 ```
@@ -93,7 +95,7 @@ public class SpELCustomerExample {
 }
 ```
 Ví dụ 2:
-```
+```java
 public class SpELCustomerCheck {
     public static void main(String[] args) {
         Customer customer = new Customer("Bob");
