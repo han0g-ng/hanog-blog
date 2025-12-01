@@ -188,7 +188,7 @@ Hmmm, thế là biết thư mục home của ứng dụng này nằm ở đâu r
 <br />
 
 Một bước tiến dài, thu được thông tin về database, các phiên bản dịch vụ sử dụng. Mình đi kiếm các CVE thì cũng không thấy gì. Ít nhất cũng thu được thư mục tiếp theo cần xem xét tới, đó là `./src/server.js`:
-```
+```javascript
 import 'dotenv/config';
 import express from 'express';
 import http from 'http';
@@ -238,7 +238,7 @@ Coi như đã nắm hầu hết source code trong tay, mình cũng tìm được
 Quá rõ ràng, ứng dụng đã bị SQLi ở ngay tính năng đăng nhập, điều này mình đã nhận ra ở trên nhưng giờ mới biết cấu trúc câu truy vấn. Sau một hồi thử đọc các file `.env`, `Dockerfile` nhưng không thành công thì mình đành quay lại với lỗi này tiếp.
 
 Câu truy vấn chỉ lấy ra 1 cột duy nhất, thực hiện chuỗi payload:
-```
+```sql
 ' UNION SELECT GROUP_CONCAT(table_name) FROM information_schema.tables#
 
 ' UNION SELECT GROUP_CONCAT(column_name) FROM information_schena.columns WHERE table_name = 'flags'#

