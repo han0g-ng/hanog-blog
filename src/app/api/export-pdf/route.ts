@@ -48,28 +48,21 @@ export async function POST(request: NextRequest) {
           body {
             -webkit-print-color-adjust: exact;
             print-color-adjust: exact;
-            font-size: 10pt !important;
+            font-size: 12pt !important; /* Adjusted for approximately 20 characters per line */
           }
           
-          /* Hide metadata info at the top of writeup */
-          .text-sm.text-gray-600,
-          .dark\\:text-gray-400,
-          article > div:first-child > div:first-child {
-            display: none !important;
-          }
-          
-          /* Reduce font sizes for PDF */
-          h1 { font-size: 18pt !important; }
-          h2 { font-size: 16pt !important; }
-          h3 { font-size: 14pt !important; }
-          h4, h5, h6 { font-size: 12pt !important; }
+          /* Adjust font sizes for PDF */
+          h1 { font-size: 22pt !important; }
+          h2 { font-size: 20pt !important; }
+          h3 { font-size: 18pt !important; }
+          h4, h5, h6 { font-size: 16pt !important; }
           
           p, div, li, span {
-            font-size: 10pt !important;
+            font-size: 12pt !important;
           }
           
           code, pre {
-            font-size: 9pt !important;
+            font-size: 10pt !important;
           }
           
           /* Hide navigation elements */
