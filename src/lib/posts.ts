@@ -47,18 +47,11 @@ export function getSortedPostsData() {
     };
   });
 
-  // Sort posts by date, with hello-world always first
+  // Sort posts from newest to oldest.
   return allPostsData.sort((a, b) => {
-    // Always keep hello-world at the top
-    if (a.id === 'hello-world') return -1;
-    if (b.id === 'hello-world') return 1;
-    
-    // Sort others by date
-    if (a.date < b.date) {
-      return 1;
-    } else {
-      return -1;
-    }
+    const dateDifference = Date.parse(String(b.date)) - Date.parse(String(a.date));
+
+    return dateDifference !== 0 ? dateDifference : a.id.localeCompare(b.id);
   });
 }
 

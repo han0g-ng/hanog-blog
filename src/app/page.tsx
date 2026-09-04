@@ -20,25 +20,27 @@ export default function Home() {
         <h2 className="text-2xl sm:text-3xl font-bold mb-6 text-gray-800 dark:text-gray-200">
           <span className="border-b-4 border-green-400">Bài viết mới nhất</span>
         </h2>
-        <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+        <div className="space-y-6">
           {allPostsData.map(({ id, date, title, description }) => {
             // Determine the correct URL based on the post location
-            const postUrl = id === 'hello-world' 
-              ? `/posts/${id}` 
-              : `/writeups/${id.replace('writeup/', '')}`;
+              const postUrl = id.includes('/')
+    ? `/${id.startsWith('writeup/') ? id.replace('writeup/', 'writeups/') : id}`
+    : `/posts/${id}`;
             
             return (
-              <div key={id} className="bg-white dark:bg-gray-800 rounded-lg shadow-lg overflow-hidden hover:shadow-xl transition-shadow duration-300 aspect-square flex flex-col">
-                <div className="p-6 flex flex-col h-full">
-                  <p className="text-sm text-green-500 dark:text-green-400 mb-2 flex-shrink-0">{date}</p>
-                  <Link href={postUrl} className="block flex-grow flex flex-col">
-                    <h3 className="text-lg sm:text-xl font-bold mb-2 text-gray-800 dark:text-gray-200 hover:text-green-500 dark:hover:text-green-400 transition-colors line-clamp-2 flex-shrink-0">
-                      {title}
-                    </h3>
-                    <p className="text-sm sm:text-base text-gray-800 dark:text-gray-400 line-clamp-4 flex-grow overflow-hidden">{description}</p>
-                  </Link>
+              <div key={id} className="p-5 border border-gray-200 dark:border-gray-800 rounded-xl hover:border-gray-400 dark:hover:border-gray-600 transition-colors">
+                <div className="flex items-center gap-3 text-xs text-gray-500 dark:text-gray-400 mb-2">
+                  <span>📅 {date}</span>
                 </div>
-              </div>
+
+                <Link href={postUrl} className="text-xl font-bold text-gray-900 dark:text-gray-100 hover:text-green-600 dark:hover:text-green-400 transition-colors">
+                  {title}
+                </Link>
+
+                {description && (
+                  <p className="mt-2 text-sm text-gray-600 dark:text-gray-400 line-clamp-2">{description}</p>
+                )}
+                </div>
             );
           })}
         </div>

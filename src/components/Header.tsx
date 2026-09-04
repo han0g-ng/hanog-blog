@@ -22,6 +22,9 @@ const Header = () => {
             <Link href="/writeups" className="nav-link hover:text-green-400 transition-colors">
               Writeups
             </Link>
+            <Link href="/blogs" className="nav-link hover:text-green-400 transition-colors">
+              Blog
+            </Link>
             <Link href="/research" className="nav-link hover:text-green-400 transition-colors">
               Research
             </Link>
@@ -62,6 +65,13 @@ const Header = () => {
                 onClick={() => setMobileMenuOpen(false)}
               >
                 Writeups
+              </Link>
+              <Link 
+                href="/blogs" 
+                className="nav-link hover:text-green-400 transition-colors py-2"
+                onClick={() => setMobileMenuOpen(false)}
+              >
+                Blog
               </Link>
               <Link 
                 href="/research" 
