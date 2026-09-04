@@ -1,4 +1,4 @@
-// src/app/blog/[slug]/page.tsx
+// src/app/blogs/[slug]/page.tsx
 import { getblogData, getAllblogIds } from '@/lib/blogs';
 import { compileMDX } from 'next-mdx-remote/rsc';
 import rehypePrism from 'rehype-prism-plus';
@@ -123,7 +123,7 @@ export default async function BlogDetailPage({ params }: Props) {
         </div>
 
         {/* Table of Contents */}
-        <TableOfContents />
+        <TableOfContents contentId="blog-content" />
 
         {/* Content */}
         <div

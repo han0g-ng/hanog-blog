@@ -22,10 +22,11 @@ export default function Home() {
         </h2>
         <div className="space-y-6">
           {allPostsData.map(({ id, date, title, description }) => {
-            // Determine the correct URL based on the post location
-              const postUrl = id.includes('/')
-    ? `/${id.startsWith('writeup/') ? id.replace('writeup/', 'writeups/') : id}`
-    : `/posts/${id}`;
+            const postUrl = id.startsWith('blog/')
+              ? `/blogs/${id.replace('blog/', '')}`
+              : id.startsWith('writeup/')
+              ? `/writeups/${id.replace('writeup/', '')}`
+              : `/posts/${id}`;
             
             return (
               <div key={id} className="p-5 border border-gray-200 dark:border-gray-800 rounded-xl hover:border-gray-400 dark:hover:border-gray-600 transition-colors">

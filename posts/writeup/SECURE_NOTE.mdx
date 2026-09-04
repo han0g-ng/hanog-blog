@@ -57,7 +57,9 @@ const main = async () => {
     }
 };
 ```
+
 <h2 className="writeup-section-heading"><span className="writeup-hash">#</span> Lần mò</h2>
+
 Để ý tới các tính năng của web và các untrusted data, bao gồm:<br/>
 -- Đưa vào title và content type. Thử test XSS và thất bại; hơn nữa, đoạn này cũng sanitize khá tốt.<br/>
 -- Delete và đọc lại note theo ID. Không có gì đáng nói. <br/>
@@ -156,6 +158,7 @@ Như vậy, tương tự như bài viết đã nêu ở trên, nếu sử dụng
 
 
 <h2 className="writeup-section-heading"><span className="writeup-hash">#</span> Tấn công</h2>
+
 **Bước 1**. Tạo một note mồi nhử, trong đó nhét sẵn IP cần thiết vào trường `title`.
 ```
 POST /create HTTP/1.1

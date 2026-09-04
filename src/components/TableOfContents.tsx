@@ -8,65 +8,63 @@ interface TOCItem {
   level: number;
 }
 
-export default function TableOfContents() {
+export default function TableOfContents({ contentId = 'writeup-content' }: { contentId?: string }) {
   const [headings, setHeadings] = useState<TOCItem[]>([]);
   const [activeId, setActiveId] = useState<string>('');
 
   useEffect(() => {
-    // Lấy tất cả heading trong nội dung
-    const content = document.querySelector('#writeup-content');
-    if (!content) return;
+    let intersectionObserver: IntersectionObserver | undefined;
 
-    const headingElements = content.querySelectorAll('h1, h2, h3, h4');
-    const items: TOCItem[] = [];
+    const collectHeadings = () => {
+      const content = document.getElementById(contentId);
+      if (!content) return;
 
-    headingElements.forEach((heading, index) => {
-      // Tạo ID từ text nếu chưa có
-      let id = heading.id;
-      if (!id) {
-        const text = heading.textContent || '';
-        // Loại bỏ # ở đầu nếu có
-        const cleanText = text.replace(/^#\s*/, '');
-        id = cleanText
-          .toLowerCase()
-          .replace(/[^\w\s-]/g, '')
-          .replace(/\s+/g, '-')
-          .replace(/-+/g, '-')
-          .trim() || `heading-${index}`;
-        heading.id = id;
-      }
+      const headingElements = content.querySelectorAll('h1, h2, h3, h4');
+      const items: TOCItem[] = [];
 
-      const text = heading.textContent || '';
-      const cleanText = text.replace(/^#\s*/, ''); // Loại bỏ # ở đầu
+      headingElements.forEach((heading, index) => {
+        let id = heading.id;
+        if (!id) {
+          const cleanText = (heading.textContent || '').replace(/^#\s*/, '');
+          id = cleanText
+            .toLowerCase()
+            .replace(/[^\w\s-]/g, '')
+            .replace(/\s+/g, '-')
+            .replace(/-+/g, '-')
+            .trim() || `heading-${index}`;
+          heading.id = id;
+        }
 
-      items.push({
-        id,
-        text: cleanText,
-        level: parseInt(heading.tagName.substring(1))
-      });
-    });
-
-    setHeadings(items);
-
-    // Theo dõi scroll để highlight mục đang xem
-    const observer = new IntersectionObserver(
-      (entries) => {
-        entries.forEach((entry) => {
-          if (entry.isIntersecting) {
-            setActiveId(entry.target.id);
-          }
+        items.push({
+          id,
+          text: (heading.textContent || '').replace(/^#\s*/, ''),
+          level: parseInt(heading.tagName.substring(1))
         });
-      },
-      { 
-        rootMargin: '-100px 0px -80% 0px',
-        threshold: 0.5
-      }
-    );
+      });
 
-    headingElements.forEach((heading) => observer.observe(heading));
+      setHeadings(items);
 
-    return () => observer.disconnect();
-  }, []);
+      intersectionObserver?.disconnect();
+      intersectionObserver = new IntersectionObserver(
+        (entries) => {
+          entries.forEach((entry) => {
+            if (entry.isIntersecting) setActiveId(entry.target.id);
+          });
+        },
+        { rootMargin: '-100px 0px -80% 0px', threshold: 0.5 }
+      );
+      headingElements.forEach((heading) => intersectionObserver?.observe(heading));
+    };
+
+    collectHeadings();
+    const mutationObserver = new MutationObserver(collectHeadings);
+    mutationObserver.observe(document.body, { childList: true, subtree: true });
+
+    return () => {
+      mutationObserver.disconnect();
+      intersectionObserver?.disconnect();
+    };
+  }, [contentId]);
 
   if (headings.length === 0) return null;
 

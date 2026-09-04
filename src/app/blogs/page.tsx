@@ -1,4 +1,4 @@
-// src/app/blog/page.tsx
+// src/app/blogs/page.tsx
 import Link from 'next/link';
 import { getSortedblogsData } from '@/lib/blogs';
 
