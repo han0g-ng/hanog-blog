@@ -1,0 +1,146 @@
+---
+title: 'Tôi đã ôn thi BSCP cấp tốc trong 1 tháng thế nào'
+date: '2026-09-04'
+ctf: 'Certification'
+category: 'Web Exploitation'
+tags: ['BSCP', 'Burp Suite', 'PortSwigger', 'Web Security']
+---
+
+<h1 className="writeup-title">BSCP (Burp Suite Certified Practitioner)</h1>
+
+<div style={{ display: 'flex', justifyContent: 'center', margin: '2rem 0' }}>
+  <img
+    src="/images/blog/bscp/cert.png"
+    alt="Ảnh chứng chỉ BSCP"
+    style={{ width: '100%', maxWidth: '800px', height: 'auto', borderRadius: '8px' }}
+  />
+</div>
+<br/>
+
+<h2 className="writeup-section-heading"><span className="writeup-hash">#</span> Một chút tường thuật</h2>
+
+BSCP là một chứng chỉ không khó, giá cả cũng phải chăng (99 đô), phù hợp với những người ở level chập chững như mình, cũng là một điểm khởi đầu khá tốt trong con đường săn các chứng chỉ khác.
+<br />
+Học cái này cho ta kha khá kiến thức về các lỗ hổng web cơ bản, từ đó phát triển lên các tầng skill tiếp theo.
+<br />
+
+
+--> Nhưng tóm lại mình thi để có cái bỏ vào CV, cũng như một phần công việc hiện tại
+<br />
+<div style={{ display: 'flex', justifyContent: 'center', margin: '2rem 0' }}>
+  <img
+    src="/images/blog/bscp/tryhard.jpeg"
+    alt="Ảnh minh họa"
+    style={{ width: '100%', maxWidth: '800px', height: 'auto', borderRadius: '8px' }}
+  />
+</div>
+<br/>
+Nếu các bạn chưa biết, để thi được thì ta cần làm kha khá bài tập trên nền tảng của `Portswigger`, trên mạng cũng có nhiều lời khuyên nên cày hết các dạng bài rồi hãy đi thi - và lời khuyên này là đúng nhé.
+<br />
+
+Trước đó mình cũng làm được một phần bài tập trên nền tảng này, nhưng chưa nghiêm túc lắm (cụ thể thấy hơi nản thì bỏ thi cái khác, mình thích mấy bài có code như trên Hackthebox chẳng hạn hơn)
+<br />
+Đến cuối tháng 7, nhận ra cần có chứng chỉ gấp rút, mình hỏi chatGPT cách pass trong 1 tháng, rồi lao vào luyện tập. Thực ra ban đầu cũng khá rén, bởi trên mạng có nhiều người làm việc kinh nghiệm nhiều năm còn thi vài lần ~~ Mà hầu hết các blog đều nói thi hơn 1 lần mới pass.
+<br />
+Nghĩ lạc quan là chắc do họ chểnh mảng không ôn tập kỹ nên mới vậy - mình vạch ra lộ trình luyện tập - `kinh nghiệm thi sẽ được trình bày ở phần sau`
+<br />
+<div style={{ display: 'flex', justifyContent: 'center', margin: '2rem 0' }}>
+  <img
+    src="/images/blog/bscp/progress.png"
+    alt="Ảnh minh họa"
+    style={{ width: '100%', maxWidth: '800px', height: 'auto', borderRadius: '8px' }}
+  />
+</div>
+<br />
+
+Trong 1 tháng, mình cố gắng hoàn thành hết các bài tập ở các mức dễ và trung bình (lúc đi thi thì khoảng 85% lab), tự chuẩn bị cho mình cheatsheet, đọc các lời khuyên trên mạng,... Cuối cùng sau khi làm khoảng 100 mystery lab (tức là các bài mà che tên để không biết có lỗ hổng gì, và còn không biết cần làm gì luôn - trigger XSS hay là đổi mail gì đó), nhận thấy mình bắt đầu có cảm giác chán chường của một người mài rìu quá nhiều mà không chặt cây, mình quyết định mua voucher và thi gấp ngay trước kì nghỉ lễ.
+<br />
+
+<h2 className="writeup-section-heading"><span className="writeup-hash">#</span> Trong lúc thi</h2>
+
+Sáng thứ 7 ngày 29/8, mình bò dậy chuẩn bị không gian làm việc, setup máy móc lần cuối cùng để đảm bảo không xảy ra sự cố (lo nhất là mất điện vì trước có lần mình đang thi online thì bị). Sau đấy thấy cơ thể chưa sẵn sàng lắm, nghỉ ngơi một lát và 11h mình mới bắt đầu thi.
+<br />
+
+~~ trận chiến bắt đầu
+<br />
+<br />
+<div style={{ display: 'flex', justifyContent: 'center', margin: '2rem 0' }}>
+  <img
+    src="/images/blog/bscp/justdoit.jpeg"
+    alt="Ảnh minh họa"
+    style={{ width: '100%', maxWidth: '800px', height: 'auto', borderRadius: '8px' }}
+  />
+</div>
+<br />
+
+Sau khi mua voucher, có thể thi ngay lúc nào chỉ bằng việc nhấn vào nút tham gia thi. Sau đó sẽ có một phần mềm tự động yêu cầu upload giấy tờ, bật cam bật mic và share màn hình, dặn dò một vài điều cuối rồi quá trình thi bắt đầu.
+<br />
+
+Như đã biết, ta có 4 tiếng, 2 app cần khai thác, mỗi app bao gồm 3 lỗ hổng tương ứng với 3 stage: `chiếm tài khoản của 1 user "lỏ"` nào đó, tìm cách từ đó `leo lên user administrator`, và cuối cùng là tìm cách `đọc được một file secret` trên hệ thống. Và ta cần làm được toàn bộ để passed chứng chỉ này. 
+<br />
+
+Rất may, ở app số 1 mình chỉ mất khoảng 1p để nhìn ra lỗ hổng (vì quá quen mắt), mất vài phút tiếp theo để leo lên user thường. Lúc này cứ nghĩ mọi thứ sẽ diễn ra dễ dàng, tuy nhiên đời không như là mơ.
+<br />
+Mình cũng chỉ mất 1p nữa để đoán được nơi xảy ra lỗ hổng, rồi ngồi test cái này mất hơn 1 tiếng tiếp theo, nghĩ tất cả các kịch bản của stage 2 mà không thành công, chạy công cụ dò quét không ăn thua.
+<br />
+Ông trời không triệt đường sống bất kì ai, sau khi làm xong app số 2, mình quay lại, tìm ra vấn đề rồi giải quyết ngon lành (tuy vẫn hơi mất thời gian một chút)
+<br />
+Ở app số 2, mình vào cái khá khoai là HTTP request smuggling, cũng may ôn tập kĩ lưỡng, mình qua được rồi làm stage 2 một cách dễ dàng.
+<br />
+Stage 3 cho mình cảm giác luôn đơn giản hơn 2 stage trước, gần như chỉ cần cho payload có sẵn từ cheatsheet vào là xong.
+<br />
+
+Thi xong xuôi thì cũng tiêu tốn 3/4h làm bài, hí hửng nộp bài xong mình nhớ ra trên mạng có người bảo phải quét camera 360 độ quanh phòng trước khi thi - mà mình quên mất. 
+<br />
+Nhưng không sao, chờ đợi trong lo sợ vài ngày mình cũng nhận được mail pass chứng chỉ. Cũng may vì lỡ thi thêm lần nữa thì cũng xót ví.
+<br />
+<div style={{ display: 'flex', justifyContent: 'center', margin: '2rem 0' }}>
+  <img
+    src="/images/blog/bscp/passed.jpg"
+    alt="Ảnh minh họa"
+    style={{ width: '100%', maxWidth: '800px', height: 'auto', borderRadius: '8px' }}
+  />
+</div>
+<br />
+<br />
+<h2 className="writeup-section-heading"><span className="writeup-hash">#</span> Kinh nghiệm ôn thi</h2>
+
+Mình nghĩ nếu chuẩn bị kĩ lưỡng và không mất bình tĩnh lúc thi thì ta hoàn toàn pass chứng chỉ này và thậm chí còn thừa thời gian, lâu lâu có thể may mắn vào các lỗ hổng giống trong các bài lab, hoặc có trong cheatsheet, đỡ phải suy nghĩ nhiều cứ thế mà làm.
+<br />
+
+Nếu chưa quá tự tin vào kĩ năng, hãy luyện các bài lab trên portswigger - làm sao có thể nhận ra dấu hiệu của các lỗ hổng nhanh nhất, bên cạnh đó luyện kha khá mystery lab cũng giúp ích được nhiều điều.
+<br />
+
+Bài thi practice exam (thi thử) ban đầu làm mình cũng khá rén, vì nó thêm một chút filter, cũng thay đổi so với các lab hay làm. Như vậy rõ ràng kinh nghiệm và kỹ năng có sẵn của bản thân cũng quan trọng, từ đó xác định bài thi đối với mình là khó hay dễ.
+<br />
+
+Trên mạng có một số lời khuyên, bài viết khá hữu ích. Cụ thể ở stage nào hay gặp lỗ hổng nào, dấu hiệu nhận biết là gì, chú ý các header nào,... đại loại vậy. Một số link hữu ích mình tìm được (có lẽ vậy là đủ chứ không cần thêm đâu):
+<ul className="list-disc pl-6 space-y-2">
+  <li><a href="https://github.com/botesjuan/Burp-Suite-Certified-Practitioner-Exam-Study" target="_blank" rel="noreferrer">Burp Suite Certified Practitioner Exam Study</a></li>
+  <li><a href="https://github.com/DingyShark/BurpSuiteCertifiedPractitioner?tab=readme-ov-file" target="_blank" rel="noreferrer">BurpSuiteCertifiedPractitioner Repo</a></li>
+  <li><a href="https://github.com/D4mianWayne/BSCP/blob/main/EXAM-PAYLOADS.md" target="_blank" rel="noreferrer">BSCP Exam Payloads</a></li>
+  <li><a href="https://www.cybercertreviews.com/cheatsheets/bscp" target="_blank" rel="noreferrer">CyberCertReviews BSCP Cheatsheet</a></li>
+</ul>
+<br />
+<br />
+<br />
+Cuối cùng, hãy tổng hợp cho bản thân 1 cheatsheet thật xịn. Mà thế nào là xịn? Theo mình phải đảm bảo:
+
+<ul className="list-disc pl-6 space-y-2">
+  <li>Tra cứu nhanh payload khi nhận ra lỗ hổng</li>
+  <li>Hỗ trợ brainstorm ý tưởng (1 list các bug và stage hay gặp phải chẳng hạn)</li>
+  <li>Ghi chép lại các lab đã giải, từ đó tiện tra cứu khi tìm thấy dấu hiệu khả nghi (mình có phải máy đâu mà nhớ được hết, lâu lâu sẽ quên cái gì đó và cần tra cứu).</li>
+</ul>
+
+Có thể tham khảo cheatsheet mình tự tổng hợp ở đây: <a href="https://app.notion.com/p/BSCP-a6c00666d2fa8209bca98162854ee816" target="_blank" rel="noreferrer">Notion BSCP Cheatsheet</a>
+<br />
+
+Mấy file note, cheatsheet và blog đã cứu mình trong kì thi này, kèm một chút may mắn. Cuối cùng hãy bình tĩnh, tự tin khi đã chuẩn bị kỹ lưỡng.
+<br />
+
+<h2 className="writeup-section-heading"><span className="writeup-hash">#</span> Tổng kết</h2>
+
+Chứng chỉ cỏn con cũng là tiền đề để mình hướng tới một số cái tiếp theo, ở phân khúc học sinh sinh viên thì CPTS, CRTO, khó hơn và đắt hơn thì CWEE, OSWE,... đây cũng là những thứ mình hướng tới, mong sẽ sớm có ngày lên blog chia sẻ trải nghiệm.
+<br />
+Cuối cùng mình nhận tin mừng là công ty sẽ tài trợ cho mình chi phí thi lần này, xin cảm ơn rất nhiều, hehe. 
+
