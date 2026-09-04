@@ -11,4 +11,5 @@ Blog cá nhân chia sẻ kinh nghiệm về CTF (Capture The Flag) và bảo m�
 ## Chủ đề chính
 
 - Web Exploitation
+- Kinh nghiệm & thi cử
 
