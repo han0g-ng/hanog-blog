@@ -6,6 +6,7 @@ import 'prismjs/themes/prism-tomorrow.css';
 import ExportPDFButton from '@/components/ExportPDFButton';
 import TableOfContents from '@/components/TableOfContents';
 import { notFound } from 'next/navigation';
+import type { Metadata } from 'next';
 
 type Props = {
   params: Promise<{ slug: string }>;
@@ -20,13 +21,27 @@ export async function generateStaticParams() {
 }
 
 // Cấu hình metadata SEO
-export async function generateMetadata({ params }: Props) {
+export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { slug } = await params;
   try {
     const { frontmatter } = await getblogData(slug);
+    const title = frontmatter.title || slug;
+    const description = frontmatter.description || 'Blog post';
+
     return {
-      title: frontmatter.title || slug,
-      description: frontmatter.description || 'Blog post',
+      title,
+      description,
+      alternates: {
+        canonical: `/blogs/${slug}`,
+      },
+      openGraph: {
+        type: 'article',
+        title,
+        description,
+        url: `/blogs/${slug}`,
+        publishedTime: frontmatter.date ? String(frontmatter.date) : undefined,
+        authors: ['Hanog'],
+      },
     };
   } catch {
     return {
