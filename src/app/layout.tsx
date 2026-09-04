@@ -19,8 +19,22 @@ const jetBrainsMono = JetBrains_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "BLOG",
-  description: "Nơi chia sẻ kiến thức",
+  metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL || "https://hanog.blog"),
+  title: {
+    default: "Hanog Blog",
+    template: "%s | Hanog Blog",
+  },
+  description: "Nơi chia sẻ kiến thức về công nghệ, bảo mật và lập trình.",
+  alternates: {
+    canonical: "/",
+  },
+  openGraph: {
+    type: "website",
+    locale: "vi_VN",
+    siteName: "Hanog Blog",
+    title: "Hanog Blog",
+    description: "Nơi chia sẻ kiến thức về công nghệ, bảo mật và lập trình.",
+  },
   icons: {
     icon: "/images/favicon.png",
   },
